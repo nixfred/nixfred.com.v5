@@ -246,6 +246,70 @@ h2{font-size:clamp(40px,7.5vw,104px)}
   letter-spacing:.24em;color:var(--muted);
 }
 
+/* telemetry lamps + status line (room II) */
+.lamp{
+  display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:16px;
+  background:var(--brass-deep);vertical-align:2px;flex:none;
+  transition:background .6s,box-shadow .6s;
+}
+.lamp.up{background:var(--cyan);box-shadow:0 0 10px rgba(69,232,212,.75)}
+.lamp.down{background:var(--magenta);box-shadow:0 0 10px rgba(255,79,163,.75)}
+.tele{
+  margin-top:24px;font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:var(--muted);
+  opacity:0;transition:opacity 1s .7s;
+}
+.room.live .tele{opacity:1}
+.tele b{color:var(--cyan);font-weight:500}
+.tele.err b{color:var(--brass-dim)}
+
+/* ---------- orrery index (annex to room II) ---------- */
+.annex::before{
+  background:
+    radial-gradient(ellipse at 50% 58%,rgba(7,5,3,.72) 0%,rgba(7,5,3,.42) 42%,rgba(7,5,3,.08) 72%,transparent 86%),
+    linear-gradient(100deg,rgba(7,5,3,.7) 0%,rgba(7,5,3,.3) 30%,transparent 55%);
+}
+.omap-wrap{
+  margin-top:4vh;display:flex;justify-content:center;
+  opacity:0;transform:translateY(20px) scale(.985);
+  transition:opacity 1.1s .35s,transform 1.1s .35s;
+}
+.room.live .omap-wrap{opacity:1;transform:none}
+.omap{width:min(86vmin,820px);height:auto;overflow:visible;display:block}
+.omap .ring{fill:none;stroke:var(--hairline);stroke-width:1}
+.omap .oname{
+  font-family:var(--mono);font-size:14px;letter-spacing:.32em;fill:var(--muted);
+  text-anchor:middle;paint-order:stroke;stroke:rgba(7,5,3,.85);stroke-width:5px;
+}
+.omap .orbit{transform-box:view-box;transform-origin:50% 50%;animation:ospin var(--dur) linear infinite}
+.omap .cr{transform-box:view-box;animation:ospinr var(--dur) linear infinite}
+.o1{--dur:110s}.o2{--dur:150s}.o3{--dur:200s}.o4{--dur:260s}
+.omap .o2,.omap .o2 .cr,.omap .o4,.omap .o4 .cr{animation-direction:reverse}
+.o1 .cr{transform-origin:500px 335px}
+.o2 .cr{transform-origin:500px 245px}
+.o3 .cr{transform-origin:500px 155px}
+.o4 .cr{transform-origin:500px 65px}
+@keyframes ospin{to{transform:rotate(360deg)}}
+@keyframes ospinr{to{transform:rotate(-360deg)}}
+.omap:hover .orbit,.omap:hover .cr{animation-play-state:paused}
+.omap a{text-decoration:none;cursor:pointer}
+.o1 a{color:var(--cyan)}.o2 a{color:var(--brass)}.o3 a{color:var(--parchment)}.o4 a{color:var(--magenta)}
+.omap .pl circle{fill:currentColor;transition:filter .3s}
+.omap .pl text{
+  font-family:var(--mono);font-size:15px;letter-spacing:.2em;text-anchor:middle;
+  fill:var(--muted);paint-order:stroke;stroke:rgba(7,5,3,.85);stroke-width:4px;
+  transition:fill .3s;
+}
+.omap .pl a:hover circle,.omap .pl a:focus circle{filter:drop-shadow(0 0 9px currentColor)}
+.omap .pl a:hover text,.omap .pl a:focus text{fill:currentColor}
+.omap .sun-core{fill:var(--brass);filter:drop-shadow(0 0 18px rgba(201,162,94,.65))}
+.omap .sun-halo{fill:none;stroke:var(--cyan);stroke-width:1.5;animation:halo 4.5s ease-in-out infinite}
+@keyframes halo{0%,100%{opacity:.2}50%{opacity:.85}}
+.omap .sun-t{
+  font-family:var(--mono);font-size:17px;letter-spacing:.3em;text-anchor:middle;fill:var(--brass);
+  paint-order:stroke;stroke:rgba(7,5,3,.85);stroke-width:5px;
+}
+.omap .sun-g a:hover .sun-core{filter:drop-shadow(0 0 26px rgba(69,232,212,.8))}
+
 /* ---------- marquee ---------- */
 .marquee{
   position:relative;z-index:10;padding:4vh 0;overflow:hidden;
@@ -331,6 +395,7 @@ footer b{color:var(--brass);font-weight:500}
 @media(prefers-reduced-motion:reduce){
   .grain{animation:none}
   .marquee .r1,.marquee .r2{animation:none}
+  .omap .orbit,.omap .cr,.omap .sun-halo{animation:none}
   .split .ch b{transition:none;transform:none}
   .tag,.lede,.links,.fleet,.manifest,.term,.roman{transition:none;opacity:1;transform:none}
   .term .cursor{animation:none}
@@ -392,13 +457,94 @@ footer b{color:var(--brass);font-weight:500}
     <div class="stat"><b data-n="11">0</b><span>MONTHS OF SHIPPING</span></div>
     <div class="stat"><b data-n="1">0</b><span>LABORATORY</span></div>
   </div>
+  <div class="tele" id="tele">TELEMETRY: <b>AWAITING SWEEP</b></div>
   <div class="links">
-    <a href="https://galaxy.nixfred.com"><span class="t">The Nixfred Galaxy</span><span class="d">STAR MAP OF EVERYTHING</span></a>
-    <a href="https://youtube.nixfred.com"><span class="t">The Reading Room</span><span class="d">WATCH LESS, READ MORE</span></a>
-    <a href="https://go.nixfred.com"><span class="t">What Should I Do Today?</span><span class="d">ATLANTA, LIVE</span></a>
-    <a href="https://townhop.nixfred.com"><span class="t">Townhop</span><span class="d">TACTICAL ROUTE DISPLAY</span></a>
-    <a href="https://poly.nixfred.com"><span class="t">Polymarket War Room</span><span class="d">PAPER TRADING, REAL MARKETS</span></a>
-    <a href="https://calc.nixfred.com"><span class="t">Field Calculators</span><span class="d">ROUGH MATH, HONEST ANSWERS</span></a>
+    <a href="https://galaxy.nixfred.com"><span class="t"><i class="lamp" data-tele="galaxy"></i>The Nixfred Galaxy</span><span class="d">STAR MAP OF EVERYTHING</span></a>
+    <a href="https://youtube.nixfred.com"><span class="t"><i class="lamp" data-tele="reading"></i>The Reading Room</span><span class="d">WATCH LESS, READ MORE</span></a>
+    <a href="https://go.nixfred.com"><span class="t"><i class="lamp" data-tele="go"></i>What Should I Do Today?</span><span class="d">ATLANTA, LIVE</span></a>
+    <a href="https://townhop.nixfred.com"><span class="t"><i class="lamp" data-tele="townhop"></i>Townhop</span><span class="d">TACTICAL ROUTE DISPLAY</span></a>
+    <a href="https://poly.nixfred.com"><span class="t"><i class="lamp" data-tele="poly"></i>Polymarket War Room</span><span class="d">PAPER TRADING, REAL MARKETS</span></a>
+    <a href="https://calc.nixfred.com"><span class="t"><i class="lamp" data-tele="calc"></i>Field Calculators</span><span class="d">ROUGH MATH, HONEST ANSWERS</span></a>
+  </div>
+</section>
+
+<section class="room annex" id="orrery-map" data-z="2">
+  <div class="tag">THE ORRERY INDEX <em>// NAVIGATION</em></div>
+  <p class="lede">Twenty-one worlds in four orbits, turning around one hub.
+  <span class="dim">Hover a world to read it. Click to land on it.</span></p>
+  <div class="omap-wrap">
+  <svg class="omap" viewBox="0 0 1000 1000" role="img" aria-label="Orbit map: every project as a world orbiting nixfred.com">
+    <circle class="ring" cx="500" cy="500" r="165"/>
+    <circle class="ring" cx="500" cy="500" r="255"/>
+    <circle class="ring" cx="500" cy="500" r="345"/>
+    <circle class="ring" cx="500" cy="500" r="435"/>
+    <text class="oname" x="383" y="375">THE WORK</text>
+    <text class="oname" x="320" y="312">THE TOOLS</text>
+    <text class="oname" x="256" y="248">THE IDEAS</text>
+    <text class="oname" x="192" y="184">THE PEOPLE</text>
+
+    <g class="orbit o1">
+      <g class="pl" transform="rotate(15 500 500)"><g class="cr"><g transform="rotate(-15 500 335)">
+        <a href="https://how.nixfred.com" aria-label="Build Your Own AI"><circle cx="500" cy="335" r="8"/><text x="500" y="364">BUILD YOUR OWN AI</text></a></g></g></g>
+      <g class="pl" transform="rotate(105 500 500)"><g class="cr"><g transform="rotate(-105 500 335)">
+        <a href="https://aiwatch.nixfred.com" aria-label="AI Signal"><circle cx="500" cy="335" r="8"/><text x="500" y="364">AI SIGNAL</text></a></g></g></g>
+      <g class="pl" transform="rotate(195 500 500)"><g class="cr"><g transform="rotate(-195 500 335)">
+        <a href="https://ai.nixfred.tech" aria-label="INTEL"><circle cx="500" cy="335" r="8"/><text x="500" y="364">INTEL</text></a></g></g></g>
+      <g class="pl" transform="rotate(285 500 500)"><g class="cr"><g transform="rotate(-285 500 335)">
+        <a href="https://nixfred.com/nextstep/" aria-label="WAR ROOM"><circle cx="500" cy="335" r="8"/><text x="500" y="364">WAR ROOM</text></a></g></g></g>
+    </g>
+
+    <g class="orbit o2">
+      <g class="pl" transform="rotate(30 500 500)"><g class="cr"><g transform="rotate(-30 500 245)">
+        <a href="https://galaxy.nixfred.com" aria-label="The Nixfred Galaxy"><circle cx="500" cy="245" r="8"/><text x="500" y="274">GALAXY</text></a></g></g></g>
+      <g class="pl" transform="rotate(90 500 500)"><g class="cr"><g transform="rotate(-90 500 245)">
+        <a href="https://youtube.nixfred.com" aria-label="The Reading Room"><circle cx="500" cy="245" r="8"/><text x="500" y="274">READING ROOM</text></a></g></g></g>
+      <g class="pl" transform="rotate(150 500 500)"><g class="cr"><g transform="rotate(-150 500 245)">
+        <a href="https://go.nixfred.com" aria-label="What Should I Do Today"><circle cx="500" cy="245" r="8"/><text x="500" y="274">GO TODAY</text></a></g></g></g>
+      <g class="pl" transform="rotate(210 500 500)"><g class="cr"><g transform="rotate(-210 500 245)">
+        <a href="https://townhop.nixfred.com" aria-label="Townhop"><circle cx="500" cy="245" r="8"/><text x="500" y="274">TOWNHOP</text></a></g></g></g>
+      <g class="pl" transform="rotate(270 500 500)"><g class="cr"><g transform="rotate(-270 500 245)">
+        <a href="https://poly.nixfred.com" aria-label="Polymarket War Room"><circle cx="500" cy="245" r="8"/><text x="500" y="274">POLYMARKET</text></a></g></g></g>
+      <g class="pl" transform="rotate(330 500 500)"><g class="cr"><g transform="rotate(-330 500 245)">
+        <a href="https://calc.nixfred.com" aria-label="Field Calculators"><circle cx="500" cy="245" r="8"/><text x="500" y="274">CALCULATORS</text></a></g></g></g>
+    </g>
+
+    <g class="orbit o3">
+      <g class="pl" transform="rotate(0 500 500)"><g class="cr"><g>
+        <a href="https://physics.nixfred.com" aria-label="Where Physics Starts Sweating"><circle cx="500" cy="155" r="8"/><text x="500" y="184">PHYSICS</text></a></g></g></g>
+      <g class="pl" transform="rotate(60 500 500)"><g class="cr"><g transform="rotate(-60 500 155)">
+        <a href="https://universe.nixfred.com" aria-label="The Universe As I See It"><circle cx="500" cy="155" r="8"/><text x="500" y="184">UNIVERSE</text></a></g></g></g>
+      <g class="pl" transform="rotate(120 500 500)"><g class="cr"><g transform="rotate(-120 500 155)">
+        <a href="https://bandwidth.nixfred.com" aria-label="The Funnel and the Flood"><circle cx="500" cy="155" r="8"/><text x="500" y="184">BANDWIDTH</text></a></g></g></g>
+      <g class="pl" transform="rotate(180 500 500)"><g class="cr"><g transform="rotate(-180 500 155)">
+        <a href="https://filter.nixfred.com" aria-label="The Great Filter"><circle cx="500" cy="155" r="8"/><text x="500" y="184">THE FILTER</text></a></g></g></g>
+      <g class="pl" transform="rotate(240 500 500)"><g class="cr"><g transform="rotate(-240 500 155)">
+        <a href="https://nixfred.com/quantum/" aria-label="Quantum"><circle cx="500" cy="155" r="8"/><text x="500" y="184">QUANTUM</text></a></g></g></g>
+      <g class="pl" transform="rotate(300 500 500)"><g class="cr"><g transform="rotate(-300 500 155)">
+        <a href="https://nixfred.com/earth/" aria-label="One Day on Earth"><circle cx="500" cy="155" r="8"/><text x="500" y="184">EARTH</text></a></g></g></g>
+    </g>
+
+    <g class="orbit o4">
+      <g class="pl" transform="rotate(20 500 500)"><g class="cr"><g transform="rotate(-20 500 65)">
+        <a href="https://crystalmnix.com" aria-label="Crystal M. Nix"><circle cx="500" cy="65" r="8"/><text x="500" y="94">CRYSTAL</text></a></g></g></g>
+      <g class="pl" transform="rotate(92 500 500)"><g class="cr"><g transform="rotate(-92 500 65)">
+        <a href="https://masonnix.com" aria-label="masonnix.com"><circle cx="500" cy="65" r="8"/><text x="500" y="94">MASON</text></a></g></g></g>
+      <g class="pl" transform="rotate(164 500 500)"><g class="cr"><g transform="rotate(-164 500 65)">
+        <a href="https://sr.nixfred.com" aria-label="A Life in the Air"><circle cx="500" cy="65" r="8"/><text x="500" y="94">NIX SR.</text></a></g></g></g>
+      <g class="pl" transform="rotate(236 500 500)"><g class="cr"><g transform="rotate(-236 500 65)">
+        <a href="https://nixfred.com/ella/" aria-label="The Life of Ella Owen"><circle cx="500" cy="65" r="8"/><text x="500" y="94">ELLA</text></a></g></g></g>
+      <g class="pl" transform="rotate(308 500 500)"><g class="cr"><g transform="rotate(-308 500 65)">
+        <a href="https://nixfred.com/caregiving/" aria-label="Caregiving Journal"><circle cx="500" cy="65" r="8"/><text x="500" y="94">CAREGIVING</text></a></g></g></g>
+    </g>
+
+    <g class="sun-g">
+      <a href="https://nixfred.com" aria-label="nixfred.com, the mothership">
+        <circle class="sun-halo" cx="500" cy="500" r="44"/>
+        <circle class="sun-core" cx="500" cy="500" r="24"/>
+        <text class="sun-t" x="500" y="578">NIXFRED.COM</text>
+      </a>
+    </g>
+  </svg>
   </div>
 </section>
 
@@ -524,8 +670,8 @@ footer b{color:var(--brass);font-weight:500}
    ============================================================ */
 /* REEL_V busts browser/edge cache when the reel changes but URLs stay the same.
    Bump it every time frames are regenerated. */
-const REEL_V = 2;
-const FRAMES = { count: 270, path: 'assets/frames/frame_', pad: 4, ext: '.webp?v=' + REEL_V };
+const REEL_V = 3;
+const FRAMES = { count: 315, path: 'assets/frames/frame_', pad: 4, ext: '.webp?v=' + REEL_V };
 
 const canvas = document.getElementById('film');
 const ctx = canvas.getContext('2d');
@@ -683,6 +829,28 @@ dialLinks.forEach(a => a.addEventListener('click', e => {
   e.preventDefault();
   document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
 }));
+
+/* telemetry: lamps lit by the lab's sweep worker (cron, every 10 min) */
+const teleLine = document.getElementById('tele');
+fetch('https://telemetry.nixfred.com/')
+  .then(r => r.json())
+  .then(d => {
+    let up = 0, n = 0;
+    d.results.forEach(res => {
+      const lamp = document.querySelector('.lamp[data-tele="' + res.id + '"]');
+      if (!lamp) return;
+      n++; if (res.up) up++;
+      lamp.classList.add(res.up ? 'up' : 'down');
+      lamp.closest('a').title = res.up ? 'UP // ' + res.ms + ' MS' : 'NOT RESPONDING';
+    });
+    const t = d.checked.slice(11, 16).replace(':', '') + 'Z';
+    teleLine.innerHTML = 'SYSTEMS: <b>' + up + '/' + n +
+      (up === n ? ' NOMINAL' : ' RESPONDING') + '</b> // SWEEP ' + t;
+  })
+  .catch(() => {
+    teleLine.classList.add('err');
+    teleLine.innerHTML = 'TELEMETRY: <b>LINK QUIET</b>';
+  });
 
 </script>
 </body>

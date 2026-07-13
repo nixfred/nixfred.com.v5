@@ -12,10 +12,22 @@ index, and draw to a full-viewport canvas. Scrubbing backward is free because it
 is image selection, not video seeking. All UI animates with transform and
 opacity only. No dependencies, no build step.
 
-Current reel: **270 frames of "still drift"**: the six approved Midjourney room
+Current reel: **315 frames of "still drift"**: the six approved Midjourney room
 stills (film/stills/, cropped to 16:9) with slow ffmpeg zoompan moves, 45 frames
-per room at 1280x720. The real motion film replaces them without code changes
-beyond `FRAMES.count`.
+per room at 1280x720, plus a second 45-frame orrery block (frames 91-135) that
+backs the Orrery Index annex between rooms II and III. The real motion film
+replaces them without code changes beyond `FRAMES.count` (film the orrery clip
+12 s instead of 6 s to cover both sections).
+
+## Telemetry
+
+The status lamps in room II are fed by the `lab-telemetry` Worker
+(workers/lab-telemetry/), which sweeps the public fleet of sites every 10
+minutes on a cron trigger, stores JSON in KV, and serves it at
+https://telemetry.nixfred.com with CORS open. If the endpoint is unreachable
+the page shows TELEMETRY: LINK QUIET and the lamps stay dark; nothing breaks.
+
+Deploy it with `wrangler deploy` from workers/lab-telemetry/.
 
 ## The film pipeline (when generating the real six rooms)
 
