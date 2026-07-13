@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NIXFRED // V5 · The Laboratory</title>
+<meta name="description" content="Fred Nix, AI Infrastructure Architect. A cinematic walk through the laboratory: the fleet, the work, the ideas, the archive. Builder, breaker, walrus enthusiast.">
+<meta property="og:title" content="NIXFRED // V5 · The Laboratory">
+<meta property="og:description" content="Fred Nix, AI Infrastructure Architect. A cinematic walk through the laboratory.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://v5.nixfred.com/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='13' fill='none' stroke='%23c9a25e' stroke-width='2.5'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%2345e8d4'/%3E%3Cpath d='M16 1v6M16 25v6M1 16h6M25 16h6M5.4 5.4l4.2 4.2M22.4 22.4l4.2 4.2M26.6 5.4l-4.2 4.2M9.6 22.4l-4.2 4.2' stroke='%23c9a25e' stroke-width='2.5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0c0a07;
+  --brass:#c9a25e;
+  --brass-dim:#8a6f42;
+  --brass-deep:#4d3d24;
+  --parchment:#ece1c8;
+  --muted:#9d9078;
+  --cyan:#45e8d4;
+  --magenta:#ff4fa3;
+  --accent:var(--cyan);
+  --glass:rgba(18,14,9,.62);
+  --hairline:rgba(201,162,94,.28);
+  --serif:"Fraunces",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{
+  background:var(--ink);
+  color:var(--parchment);
+  font-family:var(--serif);
+  font-weight:300;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--brass);color:var(--ink)}
+
+/* ---------- film layer ---------- */
+#film{
+  position:fixed;inset:0;width:100vw;height:100vh;
+  z-index:0;display:block;background:var(--ink);
+}
+.vignette{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(ellipse at center,transparent 52%,rgba(5,4,2,.55) 100%),
+    linear-gradient(to bottom,rgba(5,4,2,.5),transparent 18%,transparent 82%,rgba(5,4,2,.6));
+}
+.grain{
+  position:fixed;inset:-50%;width:200%;height:200%;z-index:2;pointer-events:none;opacity:.055;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 900ms steps(4) infinite;
+}
+@keyframes grain{
+  0%{transform:translate(0,0)}25%{transform:translate(-2%,3%)}
+  50%{transform:translate(3%,-2%)}75%{transform:translate(-3%,-3%)}100%{transform:translate(2%,2%)}
+}
+
+/* ---------- HUD ---------- */
+.hud{position:fixed;z-index:20;font-family:var(--mono)}
+.hud-brand{top:22px;left:24px;line-height:1.35}
+.hud-brand .plate{
+  font-size:13px;letter-spacing:.32em;color:var(--brass);font-weight:600;
+}
+.hud-brand .sub{font-size:10px;letter-spacing:.22em;color:var(--muted)}
+.hud-brand .sub b{color:var(--accent);font-weight:500;transition:color .8s}
+.hud-reel{
+  bottom:20px;left:24px;font-size:9px;letter-spacing:.18em;color:var(--muted);
+  border:1px solid var(--hairline);padding:6px 10px;background:var(--glass);
+  backdrop-filter:blur(4px);
+}
+.hud-reel i{font-style:normal;color:var(--accent);transition:color .8s}
+
+/* dial: right edge room indicator */
+.dial{
+  position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:20;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  font-family:var(--mono);
+}
+.dial a{
+  color:var(--muted);text-decoration:none;font-size:10px;letter-spacing:.1em;
+  transition:color .4s,transform .4s;line-height:1;
+}
+.dial a.on{color:var(--accent);transform:scale(1.35)}
+.dial .track{
+  width:1px;height:64px;background:var(--hairline);position:relative;overflow:hidden;
+}
+.dial .track i{
+  position:absolute;left:0;top:0;width:100%;height:0%;background:var(--accent);
+  transition:background .8s;
+}
+
+/* zone VI shifts the accent */
+body[data-zone="6"]{--accent:var(--magenta)}
+
+/* ---------- rooms ---------- */
+main{position:relative;z-index:10}
+.room{
+  min-height:132vh;position:relative;
+  display:flex;flex-direction:column;justify-content:center;
+  padding:18vh 7vw;
+}
+.tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--brass);
+  margin-bottom:26px;display:flex;align-items:center;gap:14px;
+  opacity:0;transform:translateY(12px);transition:opacity .9s .1s,transform .9s .1s;
+}
+.tag::before{content:"";width:34px;height:1px;background:var(--brass-dim)}
+.tag em{font-style:normal;color:var(--muted);letter-spacing:.2em}
+.room.live .tag{opacity:1;transform:none}
+
+h1,h2{
+  font-weight:900;line-height:.95;letter-spacing:-.015em;
+  font-variation-settings:"opsz" 144;
+  text-wrap:balance;
+}
+h1{font-size:clamp(56px,11vw,150px)}
+h2{font-size:clamp(40px,7.5vw,104px)}
+
+/* letter reveal */
+.split .ch{
+  display:inline-block;overflow:hidden;vertical-align:top;
+}
+.split .ch b{
+  display:inline-block;font-weight:inherit;
+  transform:translateY(112%);
+  transition:transform .85s cubic-bezier(.19,1,.22,1);
+  transition-delay:calc(var(--i)*38ms);
+}
+.room.live .split .ch b{transform:translateY(0)}
+.split .sp{display:inline-block;width:.28em}
+
+.lede{
+  max-width:34em;margin-top:30px;font-size:clamp(16px,1.5vw,20px);
+  line-height:1.65;color:var(--parchment);
+  opacity:0;transform:translateY(16px);transition:opacity 1s .35s,transform 1s .35s;
+}
+.room.live .lede{opacity:1;transform:none}
+.lede .dim{color:var(--muted)}
+
+.roman{
+  position:absolute;top:14vh;right:7vw;
+  font-family:var(--serif);font-weight:300;font-size:clamp(60px,9vw,130px);
+  color:transparent;-webkit-text-stroke:1px var(--brass-deep);
+  opacity:0;transition:opacity 1.2s .2s;user-select:none;
+}
+.room.live .roman{opacity:.85}
+
+/* link rows */
+.links{
+  margin-top:44px;display:flex;flex-direction:column;gap:0;max-width:640px;
+  opacity:0;transform:translateY(18px);transition:opacity 1s .5s,transform 1s .5s;
+}
+.room.live .links{opacity:1;transform:none}
+.links a{
+  display:flex;justify-content:space-between;align-items:baseline;gap:20px;
+  padding:17px 4px;border-top:1px solid var(--hairline);
+  color:var(--parchment);text-decoration:none;
+  transition:padding .35s,background .35s;
+}
+.links a:last-child{border-bottom:1px solid var(--hairline)}
+.links a:hover{padding-left:16px;background:linear-gradient(90deg,rgba(69,232,212,.07),transparent)}
+.links .t{font-size:clamp(17px,1.8vw,22px);font-weight:600}
+.links .d{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+.links a:hover .d{color:var(--accent)}
+
+/* fleet chips (room II) */
+.fleet{
+  margin-top:40px;display:flex;flex-wrap:wrap;gap:12px;
+  opacity:0;transition:opacity 1s .55s;
+}
+.room.live .fleet{opacity:1}
+.fleet span{
+  font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--brass);
+  border:1px solid var(--hairline);padding:9px 16px;background:var(--glass);
+  backdrop-filter:blur(3px);
+  transition:border-color .4s,color .4s,transform .4s;
+}
+.fleet span:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-3px)}
+.fleet span.sun{color:var(--cyan);border-color:rgba(69,232,212,.5)}
+
+/* ---------- marquee ---------- */
+.marquee{
+  position:relative;z-index:10;padding:9vh 0;overflow:hidden;
+  display:flex;flex-direction:column;gap:14px;
+  mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
+}
+.marquee .row{display:flex;gap:0;white-space:nowrap;width:max-content}
+.marquee .row span{
+  font-family:var(--mono);font-size:clamp(13px,1.4vw,17px);letter-spacing:.3em;
+  padding:0 28px;color:var(--brass-dim);
+}
+.marquee .row span b{color:var(--brass);font-weight:500}
+.marquee .r1{animation:mq 46s linear infinite}
+.marquee .r2{animation:mq 34s linear infinite reverse}
+.marquee .r2 span{color:rgba(69,232,212,.4)}
+.marquee .r2 span b{color:var(--cyan)}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- archive cards (room V) ---------- */
+.cards{
+  margin-top:48px;display:grid;gap:18px;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  max-width:1180px;
+  opacity:0;transform:translateY(20px);transition:opacity 1s .45s,transform 1s .45s;
+}
+.room.live .cards{opacity:1;transform:none}
+.card{
+  --rx:0deg;--ry:0deg;--mx:50%;--my:50%;
+  position:relative;display:block;text-decoration:none;
+  border:1px solid var(--hairline);background:var(--glass);
+  backdrop-filter:blur(5px);
+  padding:26px 22px 22px;min-height:150px;
+  transform:perspective(700px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition:border-color .4s;
+  will-change:transform;overflow:hidden;
+}
+.card::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(340px circle at var(--mx) var(--my),rgba(69,232,212,.12),transparent 60%);
+  opacity:0;transition:opacity .4s;
+}
+.card:hover{border-color:rgba(201,162,94,.55)}
+.card:hover::after{opacity:1}
+.card .no{
+  position:absolute;top:14px;right:16px;font-family:var(--mono);
+  font-size:9px;letter-spacing:.2em;color:var(--brass-deep);
+}
+.card .name{
+  font-family:var(--serif);font-weight:600;font-size:21px;color:var(--parchment);
+  margin-bottom:8px;line-height:1.15;
+}
+.card .desc{font-size:13.5px;line-height:1.5;color:var(--muted)}
+.card .url{
+  margin-top:14px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--brass);
+}
+.card:hover .url{color:var(--cyan)}
+
+/* ---------- terminal (room VI) ---------- */
+.term{
+  margin-top:46px;max-width:620px;
+  border:1px solid rgba(255,79,163,.35);background:rgba(12,8,10,.72);
+  backdrop-filter:blur(6px);font-family:var(--mono);font-size:14px;line-height:2.1;
+  padding:26px 28px;
+  opacity:0;transform:translateY(18px);transition:opacity 1s .5s,transform 1s .5s;
+}
+.room.live .term{opacity:1;transform:none}
+.term .bar{
+  display:flex;gap:7px;margin-bottom:18px;
+}
+.term .bar i{width:9px;height:9px;border-radius:50%;background:var(--brass-deep)}
+.term .bar i:first-child{background:var(--magenta)}
+.term .bar i:nth-child(2){background:var(--brass)}
+.term .bar i:nth-child(3){background:var(--cyan)}
+.term p{color:var(--muted)}
+.term p b{color:var(--magenta);font-weight:500}
+.term a{color:var(--cyan);text-decoration:none;border-bottom:1px dotted rgba(69,232,212,.4)}
+.term a:hover{border-bottom-style:solid}
+.term .cursor{
+  display:inline-block;width:9px;height:17px;background:var(--cyan);
+  vertical-align:text-bottom;animation:blink 1.1s steps(1) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+footer{
+  position:relative;z-index:10;padding:10vh 7vw 12vh;
+  font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);
+  display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+}
+footer b{color:var(--brass);font-weight:500}
+
+/* ---------- responsive & motion ---------- */
+@media(max-width:720px){
+  .room{padding:16vh 6vw;min-height:118vh}
+  .dial{right:10px;gap:10px}
+  .roman{top:10vh;right:6vw}
+  .hud-reel{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .grain{animation:none}
+  .marquee .r1,.marquee .r2{animation:none}
+  .split .ch b{transition:none;transform:none}
+  .tag,.lede,.links,.fleet,.cards,.term,.roman{transition:none;opacity:1;transform:none}
+  .term .cursor{animation:none}
+}
+</style>
+</head>
+<body data-zone="1">
+
+<canvas id="film" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="hud hud-brand">
+  <div class="plate">F.W.&thinsp;NIX</div>
+  <div class="sub">LABORATORY // <b>V5</b></div>
+</div>
+<div class="hud hud-reel">REEL: <i>PLACEHOLDER</i> // AWAITING SIX ROOMS</div>
+
+<nav class="dial" aria-label="Rooms">
+  <a href="#study" data-z="1" class="on">I</a>
+  <a href="#orrery" data-z="2">II</a>
+  <a href="#engine" data-z="3">III</a>
+  <a href="#chamber" data-z="4">IV</a>
+  <a href="#archive" data-z="5">V</a>
+  <a href="#terminal" data-z="6">VI</a>
+  <div class="track"><i id="gauge"></i></div>
+</nav>
+
+<main>
+
+<section class="room" id="study" data-z="1">
+  <div class="roman">I</div>
+  <div class="tag">THE STUDY <em>// IDENTITY</em></div>
+  <h1 class="split">FRED NIX</h1>
+  <p class="lede">AI Infrastructure Architect. Builder, breaker, walrus enthusiast.
+  <span class="dim">This is the laboratory: every machine, every experiment, every idea,
+  wired into one system. Walk through.</span></p>
+</section>
+
+<section class="room" id="orrery" data-z="2">
+  <div class="roman">II</div>
+  <div class="tag">THE ORRERY <em>// THE SYSTEM</em></div>
+  <h2 class="split">EVERY PROJECT. ONE MACHINE.</h2>
+  <p class="lede">A fleet of named boxes on one private network, each running its own
+  intelligence, all of it orbiting the same sun.</p>
+  <div class="fleet" aria-label="The fleet">
+    <span class="sun">TAILSCALE</span><span>FNIX</span><span>RED</span><span>BLU</span>
+    <span>BOX</span><span>HIVE</span><span>MIND</span><span>MINT</span>
+  </div>
+  <div class="links">
+    <a href="https://galaxy.nixfred.com"><span class="t">The Nixfred Galaxy</span><span class="d">STAR MAP OF EVERYTHING</span></a>
+  </div>
+</section>
+
+<section class="room" id="engine" data-z="3">
+  <div class="roman">III</div>
+  <div class="tag">THE DIFFERENCE ENGINE <em>// THE WORK</em></div>
+  <h2 class="split">THE WORK</h2>
+  <p class="lede">AI infrastructure is the job and the purpose. Persistent AI teammates,
+  and the rails they run on. <span class="dim">Built in public, documented as field guides.</span></p>
+  <div class="links">
+    <a href="https://how.nixfred.com"><span class="t">Build Your Own AI</span><span class="d">THE FIELD GUIDE</span></a>
+    <a href="https://ai.nixfred.tech"><span class="t">Signal Intelligence</span><span class="d">LONG-FORM ANALYSIS</span></a>
+    <a href="https://aiwatch.nixfred.com"><span class="t">AI Signal</span><span class="d">DAILY SYNTHESIS</span></a>
+  </div>
+</section>
+
+<section class="room" id="chamber" data-z="4">
+  <div class="roman">IV</div>
+  <div class="tag">THE CLOUD CHAMBER <em>// THE IDEAS</em></div>
+  <h2 class="split">THE IDEAS</h2>
+  <p class="lede">Long-form essays from the edge of what we know,
+  <span class="dim">written where physics starts sweating.</span></p>
+  <div class="links">
+    <a href="https://physics.nixfred.com"><span class="t">The Edge of Known Physics</span><span class="d">WHERE THEORIES FAIL</span></a>
+    <a href="https://universe.nixfred.com"><span class="t">The Universe As I See It</span><span class="d">WHAT I BELIEVE</span></a>
+    <a href="https://bandwidth.nixfred.com"><span class="t">The Funnel and the Flood</span><span class="d">HUMAN BANDWIDTH</span></a>
+    <a href="https://filter.nixfred.com"><span class="t">The Great Filter</span><span class="d">ARE WE PAST IT</span></a>
+  </div>
+</section>
+
+<div class="marquee" aria-hidden="true">
+  <div class="row r1">
+    <span><b>GALAXY</b>.NIXFRED.COM</span><span><b>PHYSICS</b>.NIXFRED.COM</span><span><b>HOW</b>.NIXFRED.COM</span><span><b>GO</b>.NIXFRED.COM</span><span><b>CALC</b>.NIXFRED.COM</span><span><b>POLY</b>.NIXFRED.COM</span><span><b>UNIVERSE</b>.NIXFRED.COM</span><span><b>TOWNHOP</b>.NIXFRED.COM</span>
+    <span><b>GALAXY</b>.NIXFRED.COM</span><span><b>PHYSICS</b>.NIXFRED.COM</span><span><b>HOW</b>.NIXFRED.COM</span><span><b>GO</b>.NIXFRED.COM</span><span><b>CALC</b>.NIXFRED.COM</span><span><b>POLY</b>.NIXFRED.COM</span><span><b>UNIVERSE</b>.NIXFRED.COM</span><span><b>TOWNHOP</b>.NIXFRED.COM</span>
+  </div>
+  <div class="row r2">
+    <span>BUILDER</span><span><b>BREAKER</b></span><span>WALRUS ENTHUSIAST</span><span><b>AI INFRASTRUCTURE</b></span><span>ATLANTA GA</span><span><b>EST. THE LAB</b></span>
+    <span>BUILDER</span><span><b>BREAKER</b></span><span>WALRUS ENTHUSIAST</span><span><b>AI INFRASTRUCTURE</b></span><span>ATLANTA GA</span><span><b>EST. THE LAB</b></span>
+  </div>
+</div>
+
+<section class="room" id="archive" data-z="5">
+  <div class="roman">V</div>
+  <div class="tag">THE ARCHIVE <em>// EVERYTHING ELSE</em></div>
+  <h2 class="split">THE ARCHIVE</h2>
+  <p class="lede">A wall of brass-framed screens. <span class="dim">Every experiment stays running.</span></p>
+  <div class="cards">
+    <a class="card" href="https://youtube.nixfred.com"><span class="no">A·01</span><div class="name">The Reading Room</div><div class="desc">YouTube videos turned into deep, readable pages.</div><div class="url">YOUTUBE.NIXFRED.COM</div></a>
+    <a class="card" href="https://go.nixfred.com"><span class="no">A·02</span><div class="name">What Should I Do Today?</div><div class="desc">Real, current, structured Atlanta event data.</div><div class="url">GO.NIXFRED.COM</div></a>
+    <a class="card" href="https://townhop.nixfred.com"><span class="no">A·03</span><div class="name">Townhop</div><div class="desc">Travel a route through the best footage of every town on the way.</div><div class="url">TOWNHOP.NIXFRED.COM</div></a>
+    <a class="card" href="https://calc.nixfred.com"><span class="no">A·04</span><div class="name">Field Calculators</div><div class="desc">Rough math and honest assumptions for infrastructure conversations.</div><div class="url">CALC.NIXFRED.COM</div></a>
+    <a class="card" href="https://poly.nixfred.com"><span class="no">A·05</span><div class="name">Polymarket War Room</div><div class="desc">Paper trade real markets with fake money. Negative balances allowed.</div><div class="url">POLY.NIXFRED.COM</div></a>
+    <a class="card" href="https://news.nixfred.tech"><span class="no">A·06</span><div class="name">The Nix Times</div><div class="desc">The news, printed the old way.</div><div class="url">NEWS.NIXFRED.TECH</div></a>
+    <a class="card" href="https://sr.nixfred.com"><span class="no">A·07</span><div class="name">A Life in the Air</div><div class="desc">Freddie Wright Nix Sr. Fifty years of flight.</div><div class="url">SR.NIXFRED.COM</div></a>
+    <a class="card" href="https://shemon.live"><span class="no">A·08</span><div class="name">SHEMON</div><div class="desc">Artist, songwriter, producer. RIAA Gold credits.</div><div class="url">SHEMON.LIVE</div></a>
+  </div>
+</section>
+
+<section class="room" id="terminal" data-z="6">
+  <div class="roman">VI</div>
+  <div class="tag">THE TERMINAL <em>// TRANSMIT</em></div>
+  <h2 class="split">TRANSMIT</h2>
+  <p class="lede">The lab door is open. <span class="dim">Signal travels faster than steam.</span></p>
+  <div class="term">
+    <div class="bar"><i></i><i></i><i></i></div>
+    <p><b>&gt;</b> mail <a href="mailto:frednix@gmail.com">frednix@gmail.com</a></p>
+    <p><b>&gt;</b> code <a href="https://github.com/nixfred" rel="me">github.com/nixfred</a></p>
+    <p><b>&gt;</b> site <a href="https://nixfred.com">nixfred.com</a></p>
+    <p><b>&gt;</b> <span class="cursor"></span></p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span><b>NIXFRED.COM V5</b> // THE LABORATORY</span>
+  <span>BUILT IN THE LAB WITH <b>RED</b></span>
+</footer>
+
+<script>
+/* ============================================================
+   THE SCROLL ENGINE
+   Numbered still frames drawn to a canvas, mapped to scroll.
+   Swap FRAMES.count + drop real frames in assets/frames/ when
+   the six-room film is generated. Nothing else changes.
+   ============================================================ */
+const FRAMES = { count: 180, path: 'assets/frames/frame_', pad: 4, ext: '.webp' };
+
+const canvas = document.getElementById('film');
+const ctx = canvas.getContext('2d');
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const imgs = new Array(FRAMES.count);      // HTMLImageElement or undefined
+const ready = new Array(FRAMES.count).fill(false);
+let current = 0, target = 0, drawn = -1, armed = true;
+
+const src = i => FRAMES.path + String(i + 1).padStart(FRAMES.pad, '0') + FRAMES.ext;
+
+function load(i){
+  if (imgs[i]) return;
+  const im = new Image();
+  im.decoding = 'async';
+  im.onload = () => { ready[i] = true; if (Math.round(current) === i) { drawn = -1; arm(); } };
+  im.src = src(i);
+  imgs[i] = im;
+}
+
+/* nearest loaded frame at or around i */
+function nearest(i){
+  if (ready[i]) return i;
+  for (let d = 1; d < FRAMES.count; d++){
+    if (ready[i - d]) return i - d;
+    if (ready[i + d]) return i + d;
+  }
+  return -1;
+}
+
+function resize(){
+  canvas.width = innerWidth * devicePixelRatio;
+  canvas.height = innerHeight * devicePixelRatio;
+  drawn = -1; arm();
+}
+
+function draw(i){
+  const j = nearest(i);
+  if (j < 0 || j === drawn) return;
+  const im = imgs[j];
+  const cw = canvas.width, ch = canvas.height;
+  const s = Math.max(cw / im.naturalWidth, ch / im.naturalHeight);
+  const w = im.naturalWidth * s, h = im.naturalHeight * s;
+  ctx.drawImage(im, (cw - w) / 2, (ch - h) / 2, w, h);
+  drawn = j;
+}
+
+function progress(){
+  const max = document.documentElement.scrollHeight - innerHeight;
+  return max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
+}
+
+function tick(){
+  target = progress() * (FRAMES.count - 1);
+  current += (target - current) * 0.14;
+  if (Math.abs(target - current) < 0.4) current = target;
+  draw(Math.round(current));
+  /* idle: stop the loop when settled and drawn */
+  if (current === target && drawn === Math.round(current)) { armed = false; return; }
+  requestAnimationFrame(tick);
+}
+function arm(){ if (!armed) { armed = true; requestAnimationFrame(tick); } }
+
+/* progressive preload: every 8th frame first, then backfill */
+function preload(){
+  for (let i = 0; i < FRAMES.count; i += 8) load(i);
+  let k = 0;
+  (function fill(){
+    let n = 0;
+    while (k < FRAMES.count && n < 6){ if (!imgs[k]) { load(k); n++; } k++; }
+    if (k < FRAMES.count) setTimeout(fill, 90);
+  })();
+}
+
+resize();
+addEventListener('resize', resize);
+
+if (reduced){
+  /* static poster, no scrubbing */
+  const mid = Math.floor(FRAMES.count / 2);
+  load(mid);
+  imgs[mid].addEventListener('load', () => draw(mid));
+} else {
+  preload();
+  addEventListener('scroll', arm, { passive: true });
+  arm();
+}
+
+/* ============================================================
+   UI LAYER: transform + opacity only
+   ============================================================ */
+
+/* letter split */
+document.querySelectorAll('.split').forEach(el => {
+  const text = el.textContent;
+  el.textContent = '';
+  el.setAttribute('aria-label', text);
+  let i = 0;
+  for (const ch of text){
+    if (ch === ' '){ const s = document.createElement('span'); s.className = 'sp'; el.appendChild(s); continue; }
+    const w = document.createElement('span'); w.className = 'ch'; w.setAttribute('aria-hidden','true');
+    const b = document.createElement('b'); b.textContent = ch; b.style.setProperty('--i', i++);
+    w.appendChild(b); el.appendChild(w);
+  }
+});
+
+/* room activation + dial + zone accent */
+const dialLinks = [...document.querySelectorAll('.dial a')];
+const gauge = document.getElementById('gauge');
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting){
+      e.target.classList.add('live');
+      const z = e.target.dataset.z;
+      document.body.dataset.zone = z;
+      dialLinks.forEach(a => a.classList.toggle('on', a.dataset.z === z));
+    }
+  });
+}, { threshold: 0.28 });
+document.querySelectorAll('.room').forEach(r => io.observe(r));
+
+/* gauge fill */
+addEventListener('scroll', () => { gauge.style.height = (progress() * 100) + '%'; }, { passive: true });
+
+/* dial smooth jump */
+dialLinks.forEach(a => a.addEventListener('click', e => {
+  e.preventDefault();
+  document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+}));
+
+/* card tilt: pointer-driven transforms, never layout */
+if (matchMedia('(hover:hover) and (pointer:fine)').matches && !reduced){
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('pointermove', ev => {
+      const r = card.getBoundingClientRect();
+      const px = (ev.clientX - r.left) / r.width, py = (ev.clientY - r.top) / r.height;
+      card.style.setProperty('--ry', ((px - .5) * 10).toFixed(2) + 'deg');
+      card.style.setProperty('--rx', ((.5 - py) * 8).toFixed(2) + 'deg');
+      card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
+    });
+    card.addEventListener('pointerleave', () => {
+      card.style.setProperty('--rx','0deg'); card.style.setProperty('--ry','0deg');
+    });
+  });
+}
+</script>
+</body>
+</html>

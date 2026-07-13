@@ -1,0 +1,7 @@
+film/
+*.mp4
+*.png
+list.txt
+.DS_Store
+node_modules/
+.wrangler/
