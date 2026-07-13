@@ -77,6 +77,55 @@ body{
 }
 .hud-reel i{font-style:normal;color:var(--accent);transition:color .8s}
 
+/* resume button: always on top, three tricks:
+   1. brass light-sweep shine on a loop
+   2. gear spins and label swaps on hover
+   3. click fires an expanding accent ring before navigating
+   Accent follows the room zone (cyan, magenta in VI). */
+.resume-btn{
+  position:fixed;top:20px;right:24px;z-index:30;
+  display:flex;align-items:center;gap:11px;
+  padding:12px 18px;text-decoration:none;overflow:hidden;
+  font-family:var(--mono);font-size:12px;letter-spacing:.24em;color:var(--parchment);
+  border:1px solid var(--brass-dim);background:var(--glass);backdrop-filter:blur(6px);
+  transition:border-color .4s,box-shadow .4s;
+}
+.resume-btn:hover{border-color:var(--accent);box-shadow:0 0 22px rgba(69,232,212,.25)}
+body[data-zone="6"] .resume-btn:hover{box-shadow:0 0 22px rgba(255,79,163,.3)}
+.resume-btn::after{ /* shine sweep */
+  content:"";position:absolute;top:0;bottom:0;width:46%;left:-60%;
+  background:linear-gradient(105deg,transparent,rgba(236,225,200,.22),transparent);
+  animation:shine 3.4s ease-in-out infinite;
+}
+@keyframes shine{0%,55%{left:-60%}85%,100%{left:130%}}
+.resume-btn .gear{width:17px;height:17px;flex:none;transition:transform .7s cubic-bezier(.19,1,.22,1)}
+.resume-btn:hover .gear{transform:rotate(180deg)}
+.resume-btn .gear circle,.resume-btn .gear path{stroke:var(--accent);transition:stroke .8s}
+.resume-btn .gear .hub{fill:var(--accent);stroke:none;transition:fill .8s}
+.rb-label{position:relative;display:block;height:15px;line-height:15px;overflow:hidden;min-width:12.5em}
+.rb-label i{display:block;font-style:normal;height:15px;transition:transform .45s cubic-bezier(.19,1,.22,1)}
+.resume-btn:hover .rb-label i{transform:translateY(-15px)}
+.rb-label i:last-child{color:var(--accent)}
+.resume-btn .ring{
+  position:absolute;left:50%;top:50%;width:10px;height:10px;border-radius:50%;
+  border:2px solid var(--accent);opacity:0;transform:translate(-50%,-50%) scale(1);
+  pointer-events:none;
+}
+.resume-btn.fire .ring{animation:ringout .38s ease-out forwards}
+@keyframes ringout{
+  0%{opacity:.9;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(24)}
+}
+@media(max-width:720px){
+  .resume-btn{top:14px;right:14px;padding:10px 13px;font-size:10px}
+  .rb-label{min-width:auto}
+  .rb-label i:last-child{display:none}
+  .resume-btn:hover .rb-label i{transform:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .resume-btn::after{animation:none}
+}
+
 /* dial: right edge room indicator */
 .dial{
   position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:20;
@@ -102,9 +151,9 @@ body[data-zone="6"]{--accent:var(--magenta)}
 /* ---------- rooms ---------- */
 main{position:relative;z-index:10}
 .room{
-  min-height:132vh;position:relative;
+  min-height:114vh;position:relative;
   display:flex;flex-direction:column;justify-content:center;
-  padding:18vh 7vw;
+  padding:14vh 7vw;
 }
 /* text scrim: keeps copy readable over bright film without dimming the whole shot */
 .room::before{
@@ -180,24 +229,26 @@ h2{font-size:clamp(40px,7.5vw,104px)}
 .links .d{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
 .links a:hover .d{color:var(--accent)}
 
-/* fleet chips (room II) */
-.fleet{
-  margin-top:40px;display:flex;flex-wrap:wrap;gap:12px;
+/* stats row (room II) */
+.stats{
+  margin-top:44px;display:flex;flex-wrap:wrap;gap:14px 54px;
   opacity:0;transition:opacity 1s .55s;
 }
-.room.live .fleet{opacity:1}
-.fleet span{
-  font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:var(--brass);
-  border:1px solid var(--hairline);padding:9px 16px;background:var(--glass);
-  backdrop-filter:blur(3px);
-  transition:border-color .4s,color .4s,transform .4s;
+.room.live .stats{opacity:1}
+.stat b{
+  display:block;font-family:var(--serif);font-weight:900;
+  font-size:clamp(40px,4.6vw,64px);line-height:1;color:var(--parchment);
+  font-variation-settings:"opsz" 144;
 }
-.fleet span:hover{border-color:var(--cyan);color:var(--cyan);transform:translateY(-3px)}
-.fleet span.sun{color:var(--cyan);border-color:rgba(69,232,212,.5)}
+.stat b::after{content:"";display:block;width:34px;height:2px;background:var(--accent);margin-top:10px;transition:background .8s}
+.stat span{
+  display:block;margin-top:10px;font-family:var(--mono);font-size:12px;
+  letter-spacing:.24em;color:var(--muted);
+}
 
 /* ---------- marquee ---------- */
 .marquee{
-  position:relative;z-index:10;padding:9vh 0;overflow:hidden;
+  position:relative;z-index:10;padding:4vh 0;overflow:hidden;
   display:flex;flex-direction:column;gap:14px;
   mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
@@ -272,7 +323,7 @@ footer b{color:var(--brass);font-weight:500}
 
 /* ---------- responsive & motion ---------- */
 @media(max-width:720px){
-  .room{padding:16vh 6vw;min-height:118vh}
+  .room{padding:12vh 6vw;min-height:104vh}
   .dial{right:10px;gap:10px}
   .roman{top:10vh;right:6vw}
   .hud-reel{display:none}
@@ -298,6 +349,16 @@ footer b{color:var(--brass);font-weight:500}
 </div>
 <div class="hud hud-reel">REEL: <i>STILL DRIFT</i> // SIX ROOMS // AWAITING MOTION</div>
 
+<a class="resume-btn" id="resumeBtn" href="https://resume.nixfred.com">
+  <svg class="gear" viewBox="0 0 32 32" fill="none" stroke-width="2.5" aria-hidden="true">
+    <circle cx="16" cy="16" r="10"/>
+    <circle class="hub" cx="16" cy="16" r="3.5"/>
+    <path d="M16 2v6M16 24v6M2 16h6M24 16h6M6.1 6.1l4.2 4.2M21.7 21.7l4.2 4.2M25.9 6.1l-4.2 4.2M10.3 21.7l-4.2 4.2"/>
+  </svg>
+  <span class="rb-label"><i>THE OPERATOR // RESUME</i><i>OPEN THE FILE</i></span>
+  <span class="ring" aria-hidden="true"></span>
+</a>
+
 <nav class="dial" aria-label="Rooms">
   <a href="#study" data-z="1" class="on">I</a>
   <a href="#orrery" data-z="2">II</a>
@@ -322,15 +383,22 @@ footer b{color:var(--brass);font-weight:500}
 <section class="room" id="orrery" data-z="2">
   <div class="roman">II</div>
   <div class="tag">THE ORRERY <em>// THE SYSTEM</em></div>
-  <h2 class="split">EVERY PROJECT. ONE MACHINE.</h2>
-  <p class="lede">A fleet of named boxes on one private network, each running its own
-  intelligence, all of it orbiting the same sun.</p>
-  <div class="fleet" aria-label="The fleet">
-    <span class="sun">TAILSCALE</span><span>FNIX</span><span>RED</span><span>BLU</span>
-    <span>BOX</span><span>HIVE</span><span>MIND</span><span>MINT</span>
+  <h2 class="split">EVERY PROJECT. ONE ORBIT.</h2>
+  <p class="lede">Nothing here is a demo. Every experiment ships, stays live, and joins
+  the constellation. <span class="dim">One system, one archive, no dead links.</span></p>
+  <div class="stats" aria-label="Laboratory statistics">
+    <div class="stat"><b data-n="45">0</b><span>PROJECTS SHIPPED</span></div>
+    <div class="stat"><b data-n="19">0</b><span>LIVE DOMAINS</span></div>
+    <div class="stat"><b data-n="11">0</b><span>MONTHS OF SHIPPING</span></div>
+    <div class="stat"><b data-n="1">0</b><span>LABORATORY</span></div>
   </div>
   <div class="links">
     <a href="https://galaxy.nixfred.com"><span class="t">The Nixfred Galaxy</span><span class="d">STAR MAP OF EVERYTHING</span></a>
+    <a href="https://youtube.nixfred.com"><span class="t">The Reading Room</span><span class="d">WATCH LESS, READ MORE</span></a>
+    <a href="https://go.nixfred.com"><span class="t">What Should I Do Today?</span><span class="d">ATLANTA, LIVE</span></a>
+    <a href="https://townhop.nixfred.com"><span class="t">Townhop</span><span class="d">TACTICAL ROUTE DISPLAY</span></a>
+    <a href="https://poly.nixfred.com"><span class="t">Polymarket War Room</span><span class="d">PAPER TRADING, REAL MARKETS</span></a>
+    <a href="https://calc.nixfred.com"><span class="t">Field Calculators</span><span class="d">ROUGH MATH, HONEST ANSWERS</span></a>
   </div>
 </section>
 
@@ -444,7 +512,7 @@ footer b{color:var(--brass);font-weight:500}
 
 <footer>
   <span><b>NIXFRED.COM V5</b> // THE LABORATORY</span>
-  <span>BUILT IN THE LAB WITH <b>RED</b></span>
+  <span>BUILT IN THE LAB WITH <b>CLAUDE</b></span>
 </footer>
 
 <script>
@@ -582,6 +650,30 @@ const io = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.28 });
 document.querySelectorAll('.room').forEach(r => io.observe(r));
+
+/* stat count-up when the orrery goes live */
+let counted = false;
+new IntersectionObserver((es, ob) => {
+  if (!es.some(e => e.isIntersecting) || counted) return;
+  counted = true; ob.disconnect();
+  document.querySelectorAll('.stat b').forEach(el => {
+    const n = +el.dataset.n, t0 = performance.now(), dur = 1100;
+    (function step(t){
+      const p = Math.min(1, (t - t0) / dur);
+      el.textContent = Math.round(n * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  });
+}, { threshold: 0.3 }).observe(document.querySelector('.stats'));
+
+/* resume button: ring burst, then navigate */
+const rbtn = document.getElementById('resumeBtn');
+rbtn.addEventListener('click', e => {
+  if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+  e.preventDefault();
+  rbtn.classList.add('fire');
+  setTimeout(() => { location.href = rbtn.href; }, 320);
+});
 
 /* gauge fill */
 addEventListener('scroll', () => { gauge.style.height = (progress() * 100) + '%'; }, { passive: true });
