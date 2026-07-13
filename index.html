@@ -66,12 +66,12 @@ body{
 .hud{position:fixed;z-index:20;font-family:var(--mono)}
 .hud-brand{top:22px;left:24px;line-height:1.35}
 .hud-brand .plate{
-  font-size:13px;letter-spacing:.32em;color:var(--brass);font-weight:600;
+  font-size:15px;letter-spacing:.32em;color:var(--brass);font-weight:600;
 }
-.hud-brand .sub{font-size:10px;letter-spacing:.22em;color:var(--muted)}
+.hud-brand .sub{font-size:12px;letter-spacing:.22em;color:var(--muted)}
 .hud-brand .sub b{color:var(--accent);font-weight:500;transition:color .8s}
 .hud-reel{
-  bottom:20px;left:24px;font-size:9px;letter-spacing:.18em;color:var(--muted);
+  bottom:20px;left:24px;font-size:11px;letter-spacing:.18em;color:var(--muted);
   border:1px solid var(--hairline);padding:6px 10px;background:var(--glass);
   backdrop-filter:blur(4px);
 }
@@ -84,7 +84,7 @@ body{
   font-family:var(--mono);
 }
 .dial a{
-  color:var(--muted);text-decoration:none;font-size:10px;letter-spacing:.1em;
+  color:var(--muted);text-decoration:none;font-size:12px;letter-spacing:.1em;
   transition:color .4s,transform .4s;line-height:1;
 }
 .dial a.on{color:var(--accent);transform:scale(1.35)}
@@ -112,8 +112,12 @@ main{position:relative;z-index:10}
   background:linear-gradient(100deg,rgba(7,5,3,.82) 0%,rgba(7,5,3,.55) 34%,rgba(7,5,3,.18) 55%,transparent 72%);
 }
 .room>*{position:relative}
+/* the archive manifest spans full width, so its scrim does too */
+#archive::before{
+  background:linear-gradient(100deg,rgba(7,5,3,.85) 0%,rgba(7,5,3,.62) 55%,rgba(7,5,3,.42) 100%);
+}
 .tag{
-  font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--brass);
+  font-family:var(--mono);font-size:13px;letter-spacing:.34em;color:var(--brass);
   margin-bottom:26px;display:flex;align-items:center;gap:14px;
   opacity:0;transform:translateY(12px);transition:opacity .9s .1s,transform .9s .1s;
 }
@@ -143,7 +147,7 @@ h2{font-size:clamp(40px,7.5vw,104px)}
 .split .sp{display:inline-block;width:.28em}
 
 .lede{
-  max-width:34em;margin-top:30px;font-size:clamp(16px,1.5vw,20px);
+  max-width:34em;margin-top:30px;font-size:clamp(18px,1.7vw,23px);
   line-height:1.65;color:var(--parchment);
   opacity:0;transform:translateY(16px);transition:opacity 1s .35s,transform 1s .35s;
 }
@@ -172,8 +176,8 @@ h2{font-size:clamp(40px,7.5vw,104px)}
 }
 .links a:last-child{border-bottom:1px solid var(--hairline)}
 .links a:hover{padding-left:16px;background:linear-gradient(90deg,rgba(69,232,212,.07),transparent)}
-.links .t{font-size:clamp(17px,1.8vw,22px);font-weight:600}
-.links .d{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+.links .t{font-size:clamp(19px,2vw,25px);font-weight:600}
+.links .d{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--muted);white-space:nowrap}
 .links a:hover .d{color:var(--accent)}
 
 /* fleet chips (room II) */
@@ -183,7 +187,7 @@ h2{font-size:clamp(40px,7.5vw,104px)}
 }
 .room.live .fleet{opacity:1}
 .fleet span{
-  font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--brass);
+  font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:var(--brass);
   border:1px solid var(--hairline);padding:9px 16px;background:var(--glass);
   backdrop-filter:blur(3px);
   transition:border-color .4s,color .4s,transform .4s;
@@ -199,61 +203,45 @@ h2{font-size:clamp(40px,7.5vw,104px)}
   -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);
 }
 .marquee .row{display:flex;gap:0;white-space:nowrap;width:max-content}
-.marquee .row span{
-  font-family:var(--mono);font-size:clamp(13px,1.4vw,17px);letter-spacing:.3em;
-  padding:0 28px;color:var(--brass-dim);
+.marquee .row span,.marquee .row a{
+  font-family:var(--mono);font-size:clamp(15px,1.6vw,20px);letter-spacing:.3em;
+  padding:0 28px;color:var(--brass-dim);text-decoration:none;
 }
-.marquee .row span b{color:var(--brass);font-weight:500}
+.marquee .row a:hover{color:var(--cyan)}
+.marquee .row a:hover b{color:var(--cyan)}
+.marquee .row span b,.marquee .row a b{color:var(--brass);font-weight:500}
 .marquee .r1{animation:mq 46s linear infinite}
 .marquee .r2{animation:mq 34s linear infinite reverse}
+.marquee .row:hover{animation-play-state:paused}
 .marquee .r2 span{color:rgba(69,232,212,.4)}
 .marquee .r2 span b{color:var(--cyan)}
 @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* ---------- archive cards (room V) ---------- */
-.cards{
-  margin-top:48px;display:grid;gap:18px;
-  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-  max-width:1180px;
+/* ---------- archive manifest (room V) ---------- */
+.manifest{
+  margin-top:48px;display:grid;gap:0 56px;
+  grid-template-columns:1fr;max-width:1240px;
   opacity:0;transform:translateY(20px);transition:opacity 1s .45s,transform 1s .45s;
 }
-.room.live .cards{opacity:1;transform:none}
-.card{
-  --rx:0deg;--ry:0deg;--mx:50%;--my:50%;
-  position:relative;display:block;text-decoration:none;
-  border:1px solid var(--hairline);background:var(--glass);
-  backdrop-filter:blur(5px);
-  padding:26px 22px 22px;min-height:150px;
-  transform:perspective(700px) rotateX(var(--rx)) rotateY(var(--ry));
-  transition:border-color .4s;
-  will-change:transform;overflow:hidden;
+@media(min-width:1100px){.manifest{grid-template-columns:1fr 1fr}}
+.room.live .manifest{opacity:1;transform:none}
+.mrow{
+  display:grid;grid-template-columns:86px 1fr auto;gap:6px 18px;align-items:baseline;
+  padding:15px 6px;border-top:1px solid var(--hairline);
+  text-decoration:none;transition:background .35s,padding .35s;
 }
-.card::after{
-  content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(340px circle at var(--mx) var(--my),rgba(69,232,212,.12),transparent 60%);
-  opacity:0;transition:opacity .4s;
-}
-.card:hover{border-color:rgba(201,162,94,.55)}
-.card:hover::after{opacity:1}
-.card .no{
-  position:absolute;top:14px;right:16px;font-family:var(--mono);
-  font-size:9px;letter-spacing:.2em;color:var(--brass-deep);
-}
-.card .name{
-  font-family:var(--serif);font-weight:600;font-size:21px;color:var(--parchment);
-  margin-bottom:8px;line-height:1.15;
-}
-.card .desc{font-size:13.5px;line-height:1.5;color:var(--muted)}
-.card .url{
-  margin-top:14px;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--brass);
-}
-.card:hover .url{color:var(--cyan)}
+.mrow:hover{background:linear-gradient(90deg,rgba(69,232,212,.08),transparent);padding-left:14px}
+.mrow .yr{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--brass)}
+.mrow .mt{font-family:var(--serif);font-weight:600;font-size:20px;color:var(--parchment);line-height:1.2}
+.mrow .mu{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--brass-dim);white-space:nowrap}
+.mrow:hover .mu{color:var(--cyan)}
+.mrow .md{grid-column:2/4;font-size:15px;line-height:1.5;color:var(--muted)}
 
 /* ---------- terminal (room VI) ---------- */
 .term{
   margin-top:46px;max-width:620px;
   border:1px solid rgba(255,79,163,.35);background:rgba(12,8,10,.72);
-  backdrop-filter:blur(6px);font-family:var(--mono);font-size:14px;line-height:2.1;
+  backdrop-filter:blur(6px);font-family:var(--mono);font-size:16px;line-height:2.1;
   padding:26px 28px;
   opacity:0;transform:translateY(18px);transition:opacity 1s .5s,transform 1s .5s;
 }
@@ -277,7 +265,7 @@ h2{font-size:clamp(40px,7.5vw,104px)}
 
 footer{
   position:relative;z-index:10;padding:10vh 7vw 12vh;
-  font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);
+  font-family:var(--mono);font-size:12px;letter-spacing:.2em;color:var(--muted);
   display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
 }
 footer b{color:var(--brass);font-weight:500}
@@ -293,7 +281,7 @@ footer b{color:var(--brass);font-weight:500}
   .grain{animation:none}
   .marquee .r1,.marquee .r2{animation:none}
   .split .ch b{transition:none;transform:none}
-  .tag,.lede,.links,.fleet,.cards,.term,.roman{transition:none;opacity:1;transform:none}
+  .tag,.lede,.links,.fleet,.manifest,.term,.roman{transition:none;opacity:1;transform:none}
   .term .cursor{animation:none}
 }
 </style>
@@ -325,7 +313,7 @@ footer b{color:var(--brass);font-weight:500}
 <section class="room" id="study" data-z="1">
   <div class="roman">I</div>
   <div class="tag">THE STUDY <em>// IDENTITY</em></div>
-  <h1 class="split">FRED NIX</h1>
+  <h1 class="split">FRED W. NIX</h1>
   <p class="lede">AI Infrastructure Architect. Builder, breaker, walrus enthusiast.
   <span class="dim">This is the laboratory: every machine, every experiment, every idea,
   wired into one system. Walk through.</span></p>
@@ -373,12 +361,12 @@ footer b{color:var(--brass);font-weight:500}
   </div>
 </section>
 
-<div class="marquee" aria-hidden="true">
+<div class="marquee">
   <div class="row r1">
-    <span><b>GALAXY</b>.NIXFRED.COM</span><span><b>PHYSICS</b>.NIXFRED.COM</span><span><b>HOW</b>.NIXFRED.COM</span><span><b>GO</b>.NIXFRED.COM</span><span><b>CALC</b>.NIXFRED.COM</span><span><b>POLY</b>.NIXFRED.COM</span><span><b>UNIVERSE</b>.NIXFRED.COM</span><span><b>TOWNHOP</b>.NIXFRED.COM</span>
-    <span><b>GALAXY</b>.NIXFRED.COM</span><span><b>PHYSICS</b>.NIXFRED.COM</span><span><b>HOW</b>.NIXFRED.COM</span><span><b>GO</b>.NIXFRED.COM</span><span><b>CALC</b>.NIXFRED.COM</span><span><b>POLY</b>.NIXFRED.COM</span><span><b>UNIVERSE</b>.NIXFRED.COM</span><span><b>TOWNHOP</b>.NIXFRED.COM</span>
+    <a href="https://galaxy.nixfred.com"><b>GALAXY</b>.NIXFRED.COM</a><a href="https://physics.nixfred.com"><b>PHYSICS</b>.NIXFRED.COM</a><a href="https://how.nixfred.com"><b>HOW</b>.NIXFRED.COM</a><a href="https://go.nixfred.com"><b>GO</b>.NIXFRED.COM</a><a href="https://calc.nixfred.com"><b>CALC</b>.NIXFRED.COM</a><a href="https://poly.nixfred.com"><b>POLY</b>.NIXFRED.COM</a><a href="https://universe.nixfred.com"><b>UNIVERSE</b>.NIXFRED.COM</a><a href="https://townhop.nixfred.com"><b>TOWNHOP</b>.NIXFRED.COM</a>
+    <a href="https://galaxy.nixfred.com" tabindex="-1"><b>GALAXY</b>.NIXFRED.COM</a><a href="https://physics.nixfred.com" tabindex="-1"><b>PHYSICS</b>.NIXFRED.COM</a><a href="https://how.nixfred.com" tabindex="-1"><b>HOW</b>.NIXFRED.COM</a><a href="https://go.nixfred.com" tabindex="-1"><b>GO</b>.NIXFRED.COM</a><a href="https://calc.nixfred.com" tabindex="-1"><b>CALC</b>.NIXFRED.COM</a><a href="https://poly.nixfred.com" tabindex="-1"><b>POLY</b>.NIXFRED.COM</a><a href="https://universe.nixfred.com" tabindex="-1"><b>UNIVERSE</b>.NIXFRED.COM</a><a href="https://townhop.nixfred.com" tabindex="-1"><b>TOWNHOP</b>.NIXFRED.COM</a>
   </div>
-  <div class="row r2">
+  <div class="row r2" aria-hidden="true">
     <span>BUILDER</span><span><b>BREAKER</b></span><span>WALRUS ENTHUSIAST</span><span><b>AI INFRASTRUCTURE</b></span><span>ATLANTA GA</span><span><b>EST. THE LAB</b></span>
     <span>BUILDER</span><span><b>BREAKER</b></span><span>WALRUS ENTHUSIAST</span><span><b>AI INFRASTRUCTURE</b></span><span>ATLANTA GA</span><span><b>EST. THE LAB</b></span>
   </div>
@@ -388,16 +376,53 @@ footer b{color:var(--brass);font-weight:500}
   <div class="roman">V</div>
   <div class="tag">THE ARCHIVE <em>// EVERYTHING ELSE</em></div>
   <h2 class="split">THE ARCHIVE</h2>
-  <p class="lede">A wall of brass-framed screens. <span class="dim">Every experiment stays running.</span></p>
-  <div class="cards">
-    <a class="card" href="https://youtube.nixfred.com"><span class="no">A·01</span><div class="name">The Reading Room</div><div class="desc">YouTube videos turned into deep, readable pages.</div><div class="url">YOUTUBE.NIXFRED.COM</div></a>
-    <a class="card" href="https://go.nixfred.com"><span class="no">A·02</span><div class="name">What Should I Do Today?</div><div class="desc">Real, current, structured Atlanta event data.</div><div class="url">GO.NIXFRED.COM</div></a>
-    <a class="card" href="https://townhop.nixfred.com"><span class="no">A·03</span><div class="name">Townhop</div><div class="desc">Travel a route through the best footage of every town on the way.</div><div class="url">TOWNHOP.NIXFRED.COM</div></a>
-    <a class="card" href="https://calc.nixfred.com"><span class="no">A·04</span><div class="name">Field Calculators</div><div class="desc">Rough math and honest assumptions for infrastructure conversations.</div><div class="url">CALC.NIXFRED.COM</div></a>
-    <a class="card" href="https://poly.nixfred.com"><span class="no">A·05</span><div class="name">Polymarket War Room</div><div class="desc">Paper trade real markets with fake money. Negative balances allowed.</div><div class="url">POLY.NIXFRED.COM</div></a>
-    <a class="card" href="https://news.nixfred.tech"><span class="no">A·06</span><div class="name">The Nix Times</div><div class="desc">The news, printed the old way.</div><div class="url">NEWS.NIXFRED.TECH</div></a>
-    <a class="card" href="https://sr.nixfred.com"><span class="no">A·07</span><div class="name">A Life in the Air</div><div class="desc">Freddie Wright Nix Sr. Fifty years of flight.</div><div class="url">SR.NIXFRED.COM</div></a>
-    <a class="card" href="https://shemon.live"><span class="no">A·08</span><div class="name">SHEMON</div><div class="desc">Artist, songwriter, producer. RIAA Gold credits.</div><div class="url">SHEMON.LIVE</div></a>
+  <p class="lede">Every project, newest first. <span class="dim">Every experiment stays running.</span></p>
+  <div class="manifest">
+    <a class="mrow" href="https://galaxy.nixfred.com"><span class="yr">2026.07</span><span class="mt">Nixfred Galaxy</span><span class="mu">GALAXY.NIXFRED.COM</span><span class="md">Every project, one connected system. An interactive star map.</span></a>
+    <a class="mrow" href="https://filter.nixfred.com"><span class="yr">2026.07</span><span class="mt">The Great Filter</span><span class="mu">FILTER.NIXFRED.COM</span><span class="md">Are we past it, or is it still ahead.</span></a>
+    <a class="mrow" href="https://poly.nixfred.com"><span class="yr">2026.07</span><span class="mt">Polymarket War Room</span><span class="mu">POLY.NIXFRED.COM</span><span class="md">Paper trade real markets with fake money. Negative balances allowed.</span></a>
+    <a class="mrow" href="https://calc.nixfred.com"><span class="yr">2026.07</span><span class="mt">Field Calculators</span><span class="mu">CALC.NIXFRED.COM</span><span class="md">Rough math and honest assumptions for infrastructure conversations.</span></a>
+    <a class="mrow" href="https://go.nixfred.com"><span class="yr">2026.07</span><span class="mt">What Should I Do Today?</span><span class="mu">GO.NIXFRED.COM</span><span class="md">Real, current, structured Atlanta event data.</span></a>
+    <a class="mrow" href="https://townhop.nixfred.com"><span class="yr">2026.06</span><span class="mt">Townhop</span><span class="mu">TOWNHOP.NIXFRED.COM</span><span class="md">Travel a route through the best footage of every town on the way.</span></a>
+    <a class="mrow" href="https://youtube.nixfred.com"><span class="yr">2026.06</span><span class="mt">The Reading Room</span><span class="mu">YOUTUBE.NIXFRED.COM</span><span class="md">YouTube videos turned into deep, readable pages.</span></a>
+    <a class="mrow" href="https://bandwidth.nixfred.com"><span class="yr">2026.06</span><span class="mt">The Funnel and the Flood</span><span class="mu">BANDWIDTH.NIXFRED.COM</span><span class="md">The bandwidth of human communication, from the wink to fiber to AI.</span></a>
+    <a class="mrow" href="https://sr.nixfred.com"><span class="yr">2026.06</span><span class="mt">A Life in the Air</span><span class="mu">SR.NIXFRED.COM</span><span class="md">Freddie Wright Nix Sr. Fifty years of flight.</span></a>
+    <a class="mrow" href="https://how.nixfred.com"><span class="yr">2026.05</span><span class="mt">Build Your Own Larry</span><span class="mu">HOW.NIXFRED.COM</span><span class="md">The 37-chapter field guide to building a persistent AI teammate.</span></a>
+    <a class="mrow" href="https://universe.nixfred.com"><span class="yr">2026.05</span><span class="mt">The Universe As I See It</span><span class="mu">UNIVERSE.NIXFRED.COM</span><span class="md">A personal cosmology, from the first instant to the last.</span></a>
+    <a class="mrow" href="https://physics.nixfred.com"><span class="yr">2026.05</span><span class="mt">Where Physics Starts Sweating</span><span class="mu">PHYSICS.NIXFRED.COM</span><span class="md">The strangest frontiers in real physics, where our best theories fail.</span></a>
+    <a class="mrow" href="https://ai.nixfred.tech"><span class="yr">2026.05</span><span class="mt">INTEL</span><span class="mu">AI.NIXFRED.TECH</span><span class="md">Signal intelligence reports. Automated intel briefings.</span></a>
+    <a class="mrow" href="https://aiwatch.nixfred.com"><span class="yr">2026.05</span><span class="mt">AI Signal</span><span class="mu">AIWATCH.NIXFRED.COM</span><span class="md">Daily expert synthesis, signal scoring, and strategic drift.</span></a>
+    <a class="mrow" href="https://shemon.live"><span class="yr">2026.05</span><span class="mt">SHEMON</span><span class="mu">SHEMON.LIVE</span><span class="md">Artist, songwriter, producer. RIAA Gold credits.</span></a>
+    <a class="mrow" href="https://dianajosephhamlin.pages.dev"><span class="yr">2026.05</span><span class="mt">Diana Joseph-Hamlin</span><span class="mu">DIANAJOSEPHHAMLIN</span><span class="md">Activity Director portfolio. Senior wellness and person-centered care.</span></a>
+    <a class="mrow" href="https://nixfred.com/PLAYBOOK.html"><span class="yr">2026.05</span><span class="mt">Site Build Playbook</span><span class="mu">/PLAYBOOK</span><span class="md">Bare Linux box to a live, hardened customer website.</span></a>
+    <a class="mrow" href="https://nixfred.com/portfolio/"><span class="yr">2026.05</span><span class="mt">Portfolio</span><span class="mu">/PORTFOLIO</span><span class="md">The whole body of work on one page.</span></a>
+    <a class="mrow" href="https://blamethe.tech"><span class="yr">2026.05</span><span class="mt">blamethe.tech</span><span class="mu">BLAMETHE.TECH</span><span class="md">It is always DNS. Except when it is BGP.</span></a>
+    <a class="mrow" href="https://houseinaround.com"><span class="yr">2026.05</span><span class="mt">House In Around</span><span class="mu">HOUSEINAROUND.COM</span><span class="md">Senior living real estate with Mary Brooks Green.</span></a>
+    <a class="mrow" href="https://nixfred.com/github/"><span class="yr">2026.05</span><span class="mt">The Code Audit</span><span class="mu">/GITHUB</span><span class="md">All 43 public repos, graded on the Eye-Roll Scale and savagely reviewed.</span></a>
+    <a class="mrow" href="https://nixfred.cloud"><span class="yr">2026.05</span><span class="mt">nixfred.cloud</span><span class="mu">NIXFRED.CLOUD</span><span class="md">A cloud that computes, and snows nix. An interactive WebGL storm.</span></a>
+    <a class="mrow" href="https://nixfred.com/claude/"><span class="yr">2026.05</span><span class="mt">Larry noticed you...</span><span class="mu">/CLAUDE</span><span class="md">Halfway in, the chat stops talking to Fred and turns to face you.</span></a>
+    <a class="mrow" href="https://nixfred.com/nutanix/"><span class="yr">2026.04</span><span class="mt">Nutanix Field Guide</span><span class="mu">/NUTANIX</span><span class="md">Reference-grade notes from the day job.</span></a>
+    <a class="mrow" href="https://nixfred.com/quantum/"><span class="yr">2026.04</span><span class="mt">Quantum</span><span class="mu">/QUANTUM</span><span class="md">From coffee cup to Willow chip. Twelve interactive chapters.</span></a>
+    <a class="mrow" href="https://crystalmnix.com"><span class="yr">2026.04</span><span class="mt">Crystal M. Nix</span><span class="mu">CRYSTALMNIX.COM</span><span class="md">Events and hospitality leadership. Built for my wife's brand.</span></a>
+    <a class="mrow" href="https://nutanix.nixfred.tech"><span class="yr">2026.04</span><span class="mt">Nutanix Daily</span><span class="mu">NUTANIX.NIXFRED.TECH</span><span class="md">A living blog of Nutanix posts.</span></a>
+    <a class="mrow" href="https://artemis.nixfred.tech"><span class="yr">2026.04</span><span class="mt">Artemis Tracker</span><span class="mu">ARTEMIS.NIXFRED.TECH</span><span class="md">Live tracking of the road back to a lunar landing.</span></a>
+    <a class="mrow" href="https://news.nixfred.tech"><span class="yr">2026.04</span><span class="mt">The Nix Times</span><span class="mu">NEWS.NIXFRED.TECH</span><span class="md">The news, printed the old way.</span></a>
+    <a class="mrow" href="https://nixfred.com/earth/"><span class="yr">2026.03</span><span class="mt">One Day on Earth</span><span class="mu">/EARTH</span><span class="md">4.5 billion years compressed into 24 hours.</span></a>
+    <a class="mrow" href="https://masonnix.com"><span class="yr">2026.02</span><span class="mt">masonnix.com</span><span class="mu">MASONNIX.COM</span><span class="md">Built for Mason.</span></a>
+    <a class="mrow" href="https://nixfred.com/ella/"><span class="yr">2026.01</span><span class="mt">The Life of Ella Owen</span><span class="mu">/ELLA</span><span class="md">A rural Georgia educator, eleven chapters of oral history.</span></a>
+    <a class="mrow" href="https://nixfred.com/nextstep/"><span class="yr">2026.01</span><span class="mt">WAR ROOM</span><span class="mu">/NEXTSTEP</span><span class="md">The AI Infrastructure Architect calling card.</span></a>
+    <a class="mrow" href="https://nixfred.com/ai/"><span class="yr">2026.01</span><span class="mt">AI Infrastructure Portfolio</span><span class="mu">/AI</span><span class="md">Agents, automation, and the systems behind the AI co-worker.</span></a>
+    <a class="mrow" href="https://nixfred.com/larry/"><span class="yr">2026.01</span><span class="mt">Meet Larry</span><span class="mu">/LARRY</span><span class="md">The AI that named itself. Born January 8, 2026.</span></a>
+    <a class="mrow" href="https://nixfred.com/lab/"><span class="yr">2026.01</span><span class="mt">P3N73S7 LAB</span><span class="mu">/LAB</span><span class="md">Story-driven penetration testing training in a safe Docker environment.</span></a>
+    <a class="mrow" href="https://nixfred.com/shadow/"><span class="yr">2026.01</span><span class="mt">Shadow Protocol</span><span class="mu">/SHADOW</span><span class="md">How attacks actually work, from infrastructure to exfiltration.</span></a>
+    <a class="mrow" href="https://nixfred.com/404/"><span class="yr">2026.01</span><span class="mt">Free Candy</span><span class="mu">/404</span><span class="md">Experience what it's like to be on the receiving end of a hack.</span></a>
+    <a class="mrow" href="https://nixfred.com/hacker/"><span class="yr">2025.12</span><span class="mt">Rejection: DENIED</span><span class="mu">/HACKER</span><span class="md">A Mr. Robot style nine-chapter experience. Got rejected? Hack back.</span></a>
+    <a class="mrow" href="https://nixfred.com/caregiving/"><span class="yr">2025.12</span><span class="mt">Caregiving Journal</span><span class="mu">/CAREGIVING</span><span class="md">Dad's Alzheimer's journey. The hardest project I've ever worked on.</span></a>
+    <a class="mrow" href="https://nixfred.com"><span class="yr">2025.08</span><span class="mt">nixfred.com, v1 to v4</span><span class="mu">NIXFRED.COM</span><span class="md">The mothership. Four versions down; you are standing in the fifth.</span></a>
+    <a class="mrow" href="https://yourdoingitallwrong.com"><span class="yr">2025.08</span><span class="mt">YDIAW Consulting</span><span class="mu">YOURDOINGITALLWRONG.COM</span><span class="md">$800/hour to tell you you're doing it wrong. Fully unlicensed since 2012.</span></a>
+    <a class="mrow" href="https://nixfred.com/skywalrus/"><span class="yr">N.D.</span><span class="mt">Sky Walrus</span><span class="mu">/SKYWALRUS</span><span class="md">50+ visualizations and a floating cyber-walrus guide.</span></a>
+    <a class="mrow" href="https://nixfred.com/docker-learner/"><span class="yr">N.D.</span><span class="mt">Docker Learner</span><span class="mu">/DOCKER-LEARNER</span><span class="md">Hands-on container fundamentals, built to actually stick.</span></a>
+    <a class="mrow" href="https://nixfred.com/network-security-hunter/"><span class="yr">N.D.</span><span class="mt">Network Security Hunter</span><span class="mu">/NETWORK-SECURITY-HUNTER</span><span class="md">Recon and defensive tradecraft.</span></a>
   </div>
 </section>
 
@@ -564,22 +589,6 @@ dialLinks.forEach(a => a.addEventListener('click', e => {
   document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
 }));
 
-/* card tilt: pointer-driven transforms, never layout */
-if (matchMedia('(hover:hover) and (pointer:fine)').matches && !reduced){
-  document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('pointermove', ev => {
-      const r = card.getBoundingClientRect();
-      const px = (ev.clientX - r.left) / r.width, py = (ev.clientY - r.top) / r.height;
-      card.style.setProperty('--ry', ((px - .5) * 10).toFixed(2) + 'deg');
-      card.style.setProperty('--rx', ((.5 - py) * 8).toFixed(2) + 'deg');
-      card.style.setProperty('--mx', (px * 100).toFixed(1) + '%');
-      card.style.setProperty('--my', (py * 100).toFixed(1) + '%');
-    });
-    card.addEventListener('pointerleave', () => {
-      card.style.setProperty('--rx','0deg'); card.style.setProperty('--ry','0deg');
-    });
-  });
-}
 </script>
 </body>
 </html>
