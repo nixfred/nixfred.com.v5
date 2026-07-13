@@ -647,7 +647,7 @@ footer b{color:var(--brass);font-weight:500}
   <p class="lede">The lab door is open. <span class="dim">Signal travels faster than steam.</span></p>
   <div class="term">
     <div class="bar"><i></i><i></i><i></i></div>
-    <p><b>&gt;</b> mail <a href="mailto:frednix@gmail.com">frednix@gmail.com</a></p>
+    <p><b>&gt;</b> mail <a id="mail" href="#"></a></p>
     <p><b>&gt;</b> code <a href="https://github.com/nixfred" rel="me">github.com/nixfred</a></p>
     <p><b>&gt;</b> site <a href="https://nixfred.com">nixfred.com</a></p>
     <p><b>&gt;</b> <span class="cursor"></span></p>
@@ -829,6 +829,13 @@ dialLinks.forEach(a => a.addEventListener('click', e => {
   e.preventDefault();
   document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
 }));
+
+/* mail link assembled here so Cloudflare's email obfuscator never fires;
+   its injected script crashes on SVG anchors (href is not a string there) */
+const mail = document.getElementById('mail');
+const addr = ['frednix', 'gmail.com'].join('@');
+mail.href = 'mailto:' + addr;
+mail.textContent = addr;
 
 /* telemetry: lamps lit by the lab's sweep worker (cron, every 10 min) */
 const teleLine = document.getElementById('tele');
