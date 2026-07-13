@@ -106,6 +106,12 @@ main{position:relative;z-index:10}
   display:flex;flex-direction:column;justify-content:center;
   padding:18vh 7vw;
 }
+/* text scrim: keeps copy readable over bright film without dimming the whole shot */
+.room::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,rgba(7,5,3,.82) 0%,rgba(7,5,3,.55) 34%,rgba(7,5,3,.18) 55%,transparent 72%);
+}
+.room>*{position:relative}
 .tag{
   font-family:var(--mono);font-size:11px;letter-spacing:.34em;color:var(--brass);
   margin-bottom:26px;display:flex;align-items:center;gap:14px;
@@ -302,7 +308,7 @@ footer b{color:var(--brass);font-weight:500}
   <div class="plate">F.W.&thinsp;NIX</div>
   <div class="sub">LABORATORY // <b>V5</b></div>
 </div>
-<div class="hud hud-reel">REEL: <i>PLACEHOLDER</i> // AWAITING SIX ROOMS</div>
+<div class="hud hud-reel">REEL: <i>STILL DRIFT</i> // SIX ROOMS // AWAITING MOTION</div>
 
 <nav class="dial" aria-label="Rooms">
   <a href="#study" data-z="1" class="on">I</a>
@@ -423,7 +429,7 @@ footer b{color:var(--brass);font-weight:500}
    Swap FRAMES.count + drop real frames in assets/frames/ when
    the six-room film is generated. Nothing else changes.
    ============================================================ */
-const FRAMES = { count: 180, path: 'assets/frames/frame_', pad: 4, ext: '.webp' };
+const FRAMES = { count: 270, path: 'assets/frames/frame_', pad: 4, ext: '.webp' };
 
 const canvas = document.getElementById('film');
 const ctx = canvas.getContext('2d');
@@ -431,7 +437,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const imgs = new Array(FRAMES.count);      // HTMLImageElement or undefined
 const ready = new Array(FRAMES.count).fill(false);
-let current = 0, target = 0, drawn = -1, armed = true;
+let current = 0, target = 0, drawn = -1, armed = false;
 
 const src = i => FRAMES.path + String(i + 1).padStart(FRAMES.pad, '0') + FRAMES.ext;
 
@@ -487,13 +493,17 @@ function tick(){
 }
 function arm(){ if (!armed) { armed = true; requestAnimationFrame(tick); } }
 
-/* progressive preload: every 8th frame first, then backfill */
+/* progressive preload: every 8th frame first, then backfill.
+   On save-data or slow connections, skip odd frames entirely;
+   nearest() bridges the gaps. */
 function preload(){
+  const conn = navigator.connection || {};
+  const step = (conn.saveData || /2g|3g/.test(conn.effectiveType || '')) ? 2 : 1;
   for (let i = 0; i < FRAMES.count; i += 8) load(i);
   let k = 0;
   (function fill(){
     let n = 0;
-    while (k < FRAMES.count && n < 6){ if (!imgs[k]) { load(k); n++; } k++; }
+    while (k < FRAMES.count && n < 6){ if (!imgs[k]) { load(k); n++; } k += step; }
     if (k < FRAMES.count) setTimeout(fill, 90);
   })();
 }

@@ -12,8 +12,10 @@ index, and draw to a full-viewport canvas. Scrubbing backward is free because it
 is image selection, not video seeking. All UI animates with transform and
 opacity only. No dependencies, no build step.
 
-Current reel: **180 placeholder frames** (ffmpeg-generated gradient drift).
-The real film replaces them without code changes beyond `FRAMES.count`.
+Current reel: **270 frames of "still drift"**: the six approved Midjourney room
+stills (film/stills/, cropped to 16:9) with slow ffmpeg zoompan moves, 45 frames
+per room at 1280x720. The real motion film replaces them without code changes
+beyond `FRAMES.count`.
 
 ## The film pipeline (when generating the real six rooms)
 
