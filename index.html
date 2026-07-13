@@ -151,9 +151,9 @@ body[data-zone="6"]{--accent:var(--magenta)}
 /* ---------- rooms ---------- */
 main{position:relative;z-index:10}
 .room{
-  min-height:114vh;position:relative;
+  min-height:102vh;position:relative;
   display:flex;flex-direction:column;justify-content:center;
-  padding:14vh 7vw;
+  padding:10vh 7vw;
 }
 /* text scrim: keeps copy readable over bright film without dimming the whole shot */
 .room::before{
@@ -183,6 +183,7 @@ h1{font-size:clamp(56px,11vw,150px)}
 h2{font-size:clamp(40px,7.5vw,104px)}
 
 /* letter reveal */
+.split .wd{display:inline-block;white-space:nowrap}
 .split .ch{
   display:inline-block;overflow:hidden;vertical-align:top;
 }
@@ -203,8 +204,29 @@ h2{font-size:clamp(40px,7.5vw,104px)}
 .room.live .lede{opacity:1;transform:none}
 .lede .dim{color:var(--muted)}
 
+/* hero meta row + descend cue */
+.meta{
+  margin-top:40px;display:flex;flex-wrap:wrap;gap:12px 0;align-items:center;
+  font-family:var(--mono);font-size:13px;letter-spacing:.22em;color:var(--muted);
+  opacity:0;transform:translateY(14px);transition:opacity 1s .55s,transform 1s .55s;
+}
+.room.live .meta{opacity:1;transform:none}
+.meta span{display:flex;align-items:center}
+.meta span+span::before{content:"";width:1px;height:14px;background:var(--hairline);margin:0 20px}
+.meta .chip b{color:var(--accent);font-weight:500;transition:color .8s}
+.cue{
+  margin-top:8vh;align-self:flex-start;display:inline-flex;align-items:center;gap:12px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--brass);
+  text-decoration:none;
+  opacity:0;transition:opacity 1s .75s,color .35s;
+}
+.room.live .cue{opacity:1}
+.cue:hover{color:var(--accent)}
+.cue i{font-style:normal;animation:cue 1.8s ease-in-out infinite}
+@keyframes cue{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
 .roman{
-  position:absolute;top:14vh;right:7vw;
+  position:absolute;top:10vh;right:7vw;
   font-family:var(--serif);font-weight:300;font-size:clamp(60px,9vw,130px);
   color:transparent;-webkit-text-stroke:1px var(--brass-deep);
   opacity:0;transition:opacity 1.2s .2s;user-select:none;
@@ -387,7 +409,7 @@ footer b{color:var(--brass);font-weight:500}
 
 /* ---------- responsive & motion ---------- */
 @media(max-width:720px){
-  .room{padding:12vh 6vw;min-height:104vh}
+  .room{padding:9vh 6vw;min-height:100vh}
   .dial{right:10px;gap:10px}
   .roman{top:10vh;right:6vw}
   .hud-reel{display:none}
@@ -397,8 +419,9 @@ footer b{color:var(--brass);font-weight:500}
   .marquee .r1,.marquee .r2{animation:none}
   .omap .orbit,.omap .cr,.omap .sun-halo{animation:none}
   .split .ch b{transition:none;transform:none}
-  .tag,.lede,.links,.fleet,.manifest,.term,.roman{transition:none;opacity:1;transform:none}
+  .tag,.lede,.links,.stats,.tele,.meta,.cue,.omap-wrap,.manifest,.term,.roman{transition:none;opacity:1;transform:none}
   .term .cursor{animation:none}
+  .cue i{animation:none}
 }
 </style>
 </head>
@@ -443,6 +466,13 @@ footer b{color:var(--brass);font-weight:500}
   <p class="lede">AI Infrastructure Architect. Builder, breaker, walrus enthusiast.
   <span class="dim">This is the laboratory: every machine, every experiment, every idea,
   wired into one system. Walk through.</span></p>
+  <div class="meta">
+    <span>ATLANTA, GA</span>
+    <span>AI INFRASTRUCTURE</span>
+    <span>45 PROJECTS // 19 DOMAINS</span>
+    <span class="chip" id="labChip">LAB: <b>SWEEPING&hellip;</b></span>
+  </div>
+  <a class="cue" href="#orrery">DESCEND INTO THE LAB <i>&#9662;</i></a>
 </section>
 
 <section class="room" id="orrery" data-z="2">
@@ -768,18 +798,22 @@ if (reduced){
    UI LAYER: transform + opacity only
    ============================================================ */
 
-/* letter split */
+/* letter split: chars grouped per word so lines can only break at spaces */
 document.querySelectorAll('.split').forEach(el => {
   const text = el.textContent;
   el.textContent = '';
   el.setAttribute('aria-label', text);
   let i = 0;
-  for (const ch of text){
-    if (ch === ' '){ const s = document.createElement('span'); s.className = 'sp'; el.appendChild(s); continue; }
-    const w = document.createElement('span'); w.className = 'ch'; w.setAttribute('aria-hidden','true');
-    const b = document.createElement('b'); b.textContent = ch; b.style.setProperty('--i', i++);
-    w.appendChild(b); el.appendChild(w);
-  }
+  text.split(' ').forEach((word, wi) => {
+    if (wi){ const s = document.createElement('span'); s.className = 'sp'; el.appendChild(s); }
+    const wd = document.createElement('span'); wd.className = 'wd'; wd.setAttribute('aria-hidden','true');
+    for (const ch of word){
+      const w = document.createElement('span'); w.className = 'ch';
+      const b = document.createElement('b'); b.textContent = ch; b.style.setProperty('--i', i++);
+      w.appendChild(b); wd.appendChild(w);
+    }
+    el.appendChild(wd);
+  });
 });
 
 /* room activation + dial + zone accent */
@@ -794,7 +828,7 @@ const io = new IntersectionObserver(entries => {
       dialLinks.forEach(a => a.classList.toggle('on', a.dataset.z === z));
     }
   });
-}, { threshold: 0.28 });
+}, { threshold: 0, rootMargin: '-18% 0px -18% 0px' });
 document.querySelectorAll('.room').forEach(r => io.observe(r));
 
 /* stat count-up when the orrery goes live */
@@ -839,6 +873,7 @@ mail.textContent = addr;
 
 /* telemetry: lamps lit by the lab's sweep worker (cron, every 10 min) */
 const teleLine = document.getElementById('tele');
+const labChip = document.getElementById('labChip');
 fetch('https://telemetry.nixfred.com/')
   .then(r => r.json())
   .then(d => {
@@ -853,10 +888,13 @@ fetch('https://telemetry.nixfred.com/')
     const t = d.checked.slice(11, 16).replace(':', '') + 'Z';
     teleLine.innerHTML = 'SYSTEMS: <b>' + up + '/' + n +
       (up === n ? ' NOMINAL' : ' RESPONDING') + '</b> // SWEEP ' + t;
+    const all = d.results.length, allUp = d.results.filter(r => r.up).length;
+    labChip.innerHTML = 'LAB: <b>' + (allUp === all ? 'ALL SYSTEMS NOMINAL' : allUp + '/' + all + ' UP') + '</b>';
   })
   .catch(() => {
     teleLine.classList.add('err');
     teleLine.innerHTML = 'TELEMETRY: <b>LINK QUIET</b>';
+    labChip.innerHTML = 'LAB: <b>RUNNING DARK</b>';
   });
 
 </script>
