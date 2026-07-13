@@ -454,7 +454,10 @@ footer b{color:var(--brass);font-weight:500}
    Swap FRAMES.count + drop real frames in assets/frames/ when
    the six-room film is generated. Nothing else changes.
    ============================================================ */
-const FRAMES = { count: 270, path: 'assets/frames/frame_', pad: 4, ext: '.webp' };
+/* REEL_V busts browser/edge cache when the reel changes but URLs stay the same.
+   Bump it every time frames are regenerated. */
+const REEL_V = 2;
+const FRAMES = { count: 270, path: 'assets/frames/frame_', pad: 4, ext: '.webp?v=' + REEL_V };
 
 const canvas = document.getElementById('film');
 const ctx = canvas.getContext('2d');
