@@ -331,6 +331,36 @@ h2{font-size:clamp(40px,7.5vw,104px)}
   paint-order:stroke;stroke:rgba(7,5,3,.85);stroke-width:5px;
 }
 .omap .sun-g a:hover .sun-core{filter:drop-shadow(0 0 26px rgba(69,232,212,.8))}
+/* orbit map hover card: whole card is the link, click-off dismisses */
+.omap.hold .orbit,.omap.hold .cr{animation-play-state:paused}
+.ocard{
+  position:fixed;z-index:28;width:min(370px,86vw);
+  display:flex;flex-direction:column;gap:10px;
+  padding:22px 24px 18px;text-decoration:none;
+  background:rgba(14,10,6,.9);border:1px solid var(--hairline);
+  backdrop-filter:blur(10px);
+  box-shadow:0 18px 60px rgba(0,0,0,.55);
+  opacity:0;pointer-events:none;
+  transform:translateY(12px) scale(.94);
+  transition:opacity .24s,transform .34s cubic-bezier(.19,1,.22,1),border-color .3s;
+}
+.ocard.on{opacity:1;pointer-events:auto;transform:none}
+.ocard.glide{transition:opacity .24s,transform .34s cubic-bezier(.19,1,.22,1),border-color .3s,
+  left .34s cubic-bezier(.19,1,.22,1),top .34s cubic-bezier(.19,1,.22,1)}
+.ocard:hover{border-color:var(--accent)}
+.oc-kick{display:flex;justify-content:space-between;gap:14px;font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--brass)}
+.oc-kick i{font-style:normal}
+.oc-kick .oc-year{color:var(--muted)}
+.oc-title{font-family:var(--serif);font-weight:900;font-size:27px;line-height:1.06;color:var(--parchment);font-variation-settings:"opsz" 144}
+.oc-host{font-family:var(--mono);font-size:12px;letter-spacing:.18em;color:var(--accent)}
+.oc-desc{font-size:15.5px;line-height:1.62;color:var(--muted);font-weight:300}
+.oc-cta{
+  margin-top:8px;padding-top:14px;border-top:1px solid var(--hairline);
+  display:flex;align-items:center;justify-content:space-between;
+  font-family:var(--mono);font-size:11px;letter-spacing:.3em;color:var(--brass);
+}
+.oc-cta b{font-weight:500;font-size:15px}
+.ocard:hover .oc-cta{color:var(--accent)}
 
 /* ---------- marquee ---------- */
 .marquee{
@@ -422,6 +452,7 @@ footer b{color:var(--brass);font-weight:500}
   .tag,.lede,.links,.stats,.tele,.meta,.cue,.omap-wrap,.manifest,.term,.roman{transition:none;opacity:1;transform:none}
   .term .cursor{animation:none}
   .cue i{animation:none}
+  .ocard,.ocard.glide{transition:none}
 }
 </style>
 </head>
@@ -576,6 +607,13 @@ footer b{color:var(--brass);font-weight:500}
     </g>
   </svg>
   </div>
+  <a class="ocard" id="ocard" href="#" aria-hidden="true">
+    <span class="oc-kick"><i class="oc-orbit"></i><i class="oc-year"></i></span>
+    <strong class="oc-title"></strong>
+    <span class="oc-host"></span>
+    <span class="oc-desc"></span>
+    <span class="oc-cta"><span>CLICK TO ENTER</span><b>&#8599;</b></span>
+  </a>
 </section>
 
 <section class="room" id="engine" data-z="3">
@@ -866,6 +904,88 @@ dialLinks.forEach(a => a.addEventListener('click', e => {
   e.preventDefault();
   document.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
 }));
+
+/* ============================================================
+   ORBIT MAP HOVER CARDS
+   Hover (or first tap) a world: a card pops beside it and holds.
+   The whole card is the link; click anywhere else dismisses it.
+   ============================================================ */
+const OINFO = {
+  'https://how.nixfred.com':        { o:'THE WORK',   y:'2026.05', t:'Build Your Own Larry',            u:'HOW.NIXFRED.COM',        d:'The 37-chapter field guide to building a persistent AI teammate. Hardware, memory, identity, voice: the whole build, documented as it happened.' },
+  'https://aiwatch.nixfred.com':    { o:'THE WORK',   y:'2026.05', t:'AI Signal',                       u:'AIWATCH.NIXFRED.COM',    d:'Daily expert synthesis of the AI firehose. Signal scoring, strategic drift, and what actually matters this week.' },
+  'https://ai.nixfred.tech':        { o:'THE WORK',   y:'2026.05', t:'INTEL',                           u:'AI.NIXFRED.TECH',        d:'Automated signal intelligence on the AI industry. Briefings written by the machines, about the machines.' },
+  'https://nixfred.com/nextstep/':  { o:'THE WORK',   y:'2026.01', t:'WAR ROOM',                        u:'NIXFRED.COM/NEXTSTEP',   d:'The AI Infrastructure Architect calling card. Agents, automation, and the case for hiring the operator.' },
+  'https://galaxy.nixfred.com':     { o:'THE TOOLS',  y:'2026.07', t:'The Nixfred Galaxy',              u:'GALAXY.NIXFRED.COM',     d:'Every project rendered as one connected star map. Fly the constellation, land on any world.' },
+  'https://youtube.nixfred.com':    { o:'THE TOOLS',  y:'2026.06', t:'The Reading Room',                u:'YOUTUBE.NIXFRED.COM',    d:'YouTube videos turned into deep, readable pages. Watch less, read more, keep the knowledge.' },
+  'https://go.nixfred.com':         { o:'THE TOOLS',  y:'2026.07', t:'What Should I Do Today?',         u:'GO.NIXFRED.COM',         d:'Real, current, structured Atlanta event data. Built to answer exactly one question: what should I do today?' },
+  'https://townhop.nixfred.com':    { o:'THE TOOLS',  y:'2026.06', t:'Townhop',                         u:'TOWNHOP.NIXFRED.COM',    d:'Plot a route, then travel it through the best footage of every town along the way. A tactical display for wandering.' },
+  'https://poly.nixfred.com':       { o:'THE TOOLS',  y:'2026.07', t:'Polymarket War Room',             u:'POLY.NIXFRED.COM',       d:'Paper trade real Polymarket markets with fake money. Negative balances allowed, lessons free.' },
+  'https://calc.nixfred.com':       { o:'THE TOOLS',  y:'2026.07', t:'Field Calculators',               u:'CALC.NIXFRED.COM',       d:'Rough math and honest assumptions for infrastructure conversations. Quick answers you can defend.' },
+  'https://physics.nixfred.com':    { o:'THE IDEAS',  y:'2026.05', t:'Where Physics Starts Sweating',   u:'PHYSICS.NIXFRED.COM',    d:'Long-form essays from the strangest frontiers of real physics. Written where our best theories start to fail.' },
+  'https://universe.nixfred.com':   { o:'THE IDEAS',  y:'2026.05', t:'The Universe As I See It',        u:'UNIVERSE.NIXFRED.COM',   d:'A personal cosmology, from the first instant to the last. What I believe, and why.' },
+  'https://bandwidth.nixfred.com':  { o:'THE IDEAS',  y:'2026.06', t:'The Funnel and the Flood',        u:'BANDWIDTH.NIXFRED.COM',  d:'The bandwidth of human communication, from the wink to fiber to AI. First the funnel, then the flood.' },
+  'https://filter.nixfred.com':     { o:'THE IDEAS',  y:'2026.07', t:'The Great Filter',                u:'FILTER.NIXFRED.COM',     d:'The Great Filter, examined honestly. Are we past it, or is it still ahead of us?' },
+  'https://nixfred.com/quantum/':   { o:'THE IDEAS',  y:'2026.04', t:'Quantum',                         u:'NIXFRED.COM/QUANTUM',    d:'From coffee cup to Willow chip in twelve interactive chapters. Quantum computing without the hand-waving.' },
+  'https://nixfred.com/earth/':     { o:'THE IDEAS',  y:'2026.03', t:'One Day on Earth',                u:'NIXFRED.COM/EARTH',      d:'4.5 billion years compressed into 24 hours. The whole story of the planet, one day long.' },
+  'https://crystalmnix.com':        { o:'THE PEOPLE', y:'2026.04', t:'Crystal M. Nix',                  u:'CRYSTALMNIX.COM',        d:'Events and hospitality leadership. Built for my wife Crystal’s brand.' },
+  'https://masonnix.com':           { o:'THE PEOPLE', y:'2026.02', t:'masonnix.com',                    u:'MASONNIX.COM',           d:'Built for Mason. A son’s corner of the internet.' },
+  'https://sr.nixfred.com':         { o:'THE PEOPLE', y:'2026.06', t:'A Life in the Air',               u:'SR.NIXFRED.COM',         d:'Freddie Wright Nix Sr., fifty years of flight. A life in the air, told properly.' },
+  'https://nixfred.com/ella/':      { o:'THE PEOPLE', y:'2026.01', t:'The Life of Ella Owen',           u:'NIXFRED.COM/ELLA',       d:'A rural Georgia educator, eleven chapters of oral history. The life of Ella Owen.' },
+  'https://nixfred.com/caregiving/':{ o:'THE PEOPLE', y:'2025.12', t:'Caregiving Journal',              u:'NIXFRED.COM/CAREGIVING', d:'Dad’s Alzheimer’s journey, documented. The hardest project I have ever worked on.' },
+};
+
+const ocard = document.getElementById('ocard');
+const omapEl = document.querySelector('.omap');
+let ocOpenFor = null;
+
+function ocOpen(a){
+  const info = OINFO[a.getAttribute('href')];
+  if (!info) return;
+  ocard.setAttribute('href', a.getAttribute('href'));
+  ocard.querySelector('.oc-orbit').textContent = info.o;
+  ocard.querySelector('.oc-year').textContent = info.y;
+  ocard.querySelector('.oc-title').textContent = info.t;
+  ocard.querySelector('.oc-host').textContent = info.u;
+  ocard.querySelector('.oc-desc').textContent = info.d;
+  const wasOpen = !!ocOpenFor;
+  ocard.classList.toggle('glide', wasOpen);
+  const r = a.querySelector('circle').getBoundingClientRect();
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const w = ocard.offsetWidth, h = ocard.offsetHeight;
+  let x = cx + 26;
+  if (x + w > innerWidth - 12) x = cx - 26 - w;
+  x = Math.max(12, x);
+  const y = Math.min(Math.max(cy - h / 2, 12), innerHeight - h - 12);
+  ocard.style.left = x + 'px';
+  ocard.style.top = y + 'px';
+  ocard.classList.add('on');
+  ocard.setAttribute('aria-hidden', 'false');
+  omapEl.classList.add('hold');
+  ocOpenFor = a;
+}
+function ocClose(){
+  if (!ocOpenFor) return;
+  ocard.classList.remove('on', 'glide');
+  ocard.setAttribute('aria-hidden', 'true');
+  omapEl.classList.remove('hold');
+  ocOpenFor = null;
+}
+document.querySelectorAll('.omap .pl a').forEach(a => {
+  a.addEventListener('pointerenter', e => { if (e.pointerType !== 'touch') ocOpen(a); });
+  a.addEventListener('focus', () => { if (matchMedia('(hover: hover)').matches) ocOpen(a); });
+  /* touch: first tap opens the card, second tap (or tapping the card) enters */
+  a.addEventListener('click', e => {
+    if (matchMedia('(hover: none)').matches && ocOpenFor !== a){ e.preventDefault(); ocOpen(a); }
+  });
+});
+document.addEventListener('pointerdown', e => {
+  if (!ocOpenFor) return;
+  if (ocard.contains(e.target)) return;
+  if (e.target.closest && e.target.closest('.pl a')) return;
+  ocClose();
+});
+addEventListener('keydown', e => { if (e.key === 'Escape') ocClose(); });
+addEventListener('scroll', ocClose, { passive: true });
 
 /* mail link assembled here so Cloudflare's email obfuscator never fires;
    its injected script crashes on SVG anchors (href is not a string there) */
